@@ -43,7 +43,6 @@ Please assume that the values in the INSTRUMENT_PRICE_MODIFIER table can change 
 but not more often than once every 5 seconds.
 
 
-
 What needs to be done:
 
 -	Create the maven project.

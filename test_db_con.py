@@ -11,17 +11,15 @@ PORT: str = int(getenv("MYSQL_DOCKER_PORT"))
 DATABASE: str = getenv("MYSQL_DATABASE")
 
 
-def test_mysql_conx() -> None:
+def test_mysql_conx(
+    user=USER, password=PASSWORD, host=HOST, port=PORT, database=DATABASE
+) -> None:
     import pymysql
 
     # Connect to MySQL
     try:
         connection = pymysql.connect(
-            host=HOST,
-            port=PORT,
-            user=USER,
-            password=PASSWORD,
-            # database=DATABASE
+            host=host, port=port, user=user, password=password, database=database
         )
     except Exception as e:
         print(e)

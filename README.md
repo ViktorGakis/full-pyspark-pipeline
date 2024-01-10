@@ -8,4 +8,4 @@ In order to create this dev environment please run
 docker-compose up -d
 ```
 
-Note that we have create a quite involved docker image `Dockerfile.pythondev` that includes all the needed groundwork for spark/pysparκ in order to work.
+Note that we have created a quite involved docker image `Dockerfile.pythondev` that includes all the needed groundwork for spark/pysparκ to be properly installed.

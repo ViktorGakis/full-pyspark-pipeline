@@ -1,8 +1,29 @@
-FROM python:3.12.1-bullseye
+# Use a Python base image
+FROM python:3.12.1-bullseye AS python-base
 
-# Install npm
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy your PySpark script into the container
+COPY . /app/
+
+# Use a separate OpenJDK image
+FROM openjdk:17-slim AS openjdk-base
+
+# Set environment variables
+ENV SPARK_VERSION=3.5.0
+ENV HADOOP_VERSION=3
+ENV SPARK_HOME=/spark
+ENV PYTHONPATH="${SPARK_HOME}/python:${SPARK_HOME}/python/lib/py4j-0.10.9-src.zip:${PYTHONPATH}"
+ENV PATH="${SPARK_HOME}/bin:${SPARK_HOME}/sbin:${PATH}"
+
+# Create the /spark directory
+RUN mkdir /spark
+
+# update, upgrade and install npm and wget
 RUN apt-get update && apt-get -y upgrade && \
     apt-get install -y --no-install-recommends \
+    wget \
     npm \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -10,11 +31,22 @@ RUN apt-get update && apt-get -y upgrade && \
 RUN npm install -g n
 RUN n stable
 
-# Set the working directory in the container
-WORKDIR /app
+# Download and extract Spark
+# https://downloads.apache.org/spark/
+RUN wget -qO- "https://downloads.apache.org/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz" | tar -xzf - -C /spark --strip-components=1
 
-COPY . /app
+# Use a final image for the combined result
+FROM python-base
+
+# Set environment variables for Spark
+ENV SPARK_HOME=/spark
+ENV PATH="${SPARK_HOME}/bin:${SPARK_HOME}/sbin:${PATH}"
+
+# Copy from the openjdk-base image
+COPY --from=openjdk-base /spark /spark
+
 RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
 # CMD [ "python", "./main.py" ]
 ENTRYPOINT ["tail", "-f", "/dev/null"]
+

@@ -1,0 +1,8 @@
+ipykernel
+pymysql
+sqlalchemy
+python-dotenv
+cryptography
+ipython-sql
+pyspark
+findspark

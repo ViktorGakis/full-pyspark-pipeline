@@ -21,8 +21,11 @@ Read time series from the file provided and pass all of them to the "calculation
 Calculation engine needs to calculate:
 
 For INSTRUMENT1 – mean
+
 For INSTRUMENT2 – mean for November 2014
+
 For INSTRUMENT3 – any other statistical calculation that we can compute "on-the-fly" as we read the file (it's up to you)
+
 For any other instrument from the input file - sum of the newest 10 elements (in terms of the date).
 
 Now, we want to emulate the fact that in the real life there are often multiple factors influencing calculations performed on the instrument prices. 

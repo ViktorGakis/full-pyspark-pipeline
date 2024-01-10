@@ -6,3 +6,4 @@ cryptography
 ipython-sql
 pyspark
 findspark
+mysql-connector-python

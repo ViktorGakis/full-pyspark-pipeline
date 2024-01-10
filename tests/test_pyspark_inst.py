@@ -1,9 +1,11 @@
 import findspark
+
 findspark.init()
 
 from pyspark.sql import SparkSession
 
-if __name__ == "__main__":
+
+def test_pyspark_con():
     # Initialize SparkSession
     spark = SparkSession.builder.appName("PySparkExample").getOrCreate()
 
@@ -17,3 +19,7 @@ if __name__ == "__main__":
 
     # Stop the SparkSession
     spark.stop()
+
+
+if __name__ == "__main__":
+    test_pyspark_con()

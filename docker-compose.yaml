@@ -1,0 +1,39 @@
+version: "3.1"
+
+services:
+    db:
+        container_name: mysql_db_cont
+        image: mysql:latest
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+        ports:
+            - "${MYSQL_HOST_PORT}:${MYSQL_DOCKER_PORT}"
+        networks:
+            - mysql-network
+
+    phpadmin:
+        container_name: phpadmin-cont
+        image: phpmyadmin:latest
+        restart: always
+        depends_on:
+            - db
+        ports:
+            - "${PHPMYADMIN_HOST_PORT}:${PHPMYADMIN_DOCKER_PORT}"
+        networks:
+            - mysql-network
+
+    pythondev:
+        container_name: pythondev
+        build:
+            context: .
+            dockerfile: Dockerfile.pythondev
+        depends_on:
+            - db
+        networks:
+            - mysql-network
+
+networks:
+    mysql-network:
+        driver: bridge

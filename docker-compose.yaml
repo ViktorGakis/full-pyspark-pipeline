@@ -2,7 +2,7 @@ version: "3.1"
 
 services:
     db:
-        container_name: mysql_db_cont
+        container_name: w_mysql_db_cont
         image: mysql:latest
         restart: always
         environment:
@@ -14,7 +14,7 @@ services:
             - mysql-network
 
     phpadmin:
-        container_name: phpadmin-cont
+        container_name: w_phpadmin-cont
         image: phpmyadmin:latest
         restart: always
         depends_on:
@@ -25,7 +25,7 @@ services:
             - mysql-network
 
     pythondev:
-        container_name: pythondev
+        container_name: w_pythondev
         build:
             context: .
             dockerfile: Dockerfile.pythondev

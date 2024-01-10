@@ -33,7 +33,8 @@ services:
             - db
         networks:
             - mysql-network
-
+        ports:
+            - "${PYTHON_HOST_PORT}:${PYTHON_DOCKER_PORT}"
 networks:
     mysql-network:
         driver: bridge

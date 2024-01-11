@@ -23,3 +23,7 @@ class Config:
     MYSQL_CONNECTOR_PATH: str | None = getenv("MYSQL_CONNECTOR_PATH")
     TABLE_NAME: str | None = getenv("TABLE_NAME")
     appName: str | None = getenv("appName")
+
+    @staticmethod
+    def get_env(key: str, default=None):
+        return getenv(key, default)

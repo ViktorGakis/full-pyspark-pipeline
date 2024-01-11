@@ -1,7 +1,12 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 from Workflow.src.config import Config
+
+# load .env file
+load_dotenv()
 
 
 def test_get_config_on_the_fly():
@@ -15,20 +20,19 @@ def test_get_config_on_the_fly():
     del os.environ["TEST_VARIABLE"]
 
 
-def test_get_config_from_env_file():
-    from dotenv import load_dotenv
-
-    # load .env file
-    load_dotenv()
-
+def test_get_config_from_env_file_1():
     # Test if Config class retrieves the correct value
     assert Config.get_env("MYSQL_ROOT_USER") == "root"
 
 
+def test_get_config_from_env_file_2():
+    # Test if Config class retrieves the correct value
+    assert Config.MYSQL_ROOT_USER == "root"
+
+
 def test_proper_version_mysql_connector():
-    assert Config.get_env("MYSQL_CONNECTOR_FILENAME") == "mysql-connector-j-8.2.0.jar"
+    assert Config.MYSQL_CONNECTOR_FILENAME == "mysql-connector-j-8.2.0.jar"
 
 
 def test_mysql_connector_path_existence():
-    assert Path(Config.get_env("MYSQL_CONNECTOR_PATH")).exists() is True
-
+    assert Path(Config.MYSQL_CONNECTOR_PATH).exists() is True

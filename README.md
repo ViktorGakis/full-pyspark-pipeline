@@ -45,7 +45,7 @@ Workflow/
 │   │   ├── __init__.py               # Make final_values a Python package
 │   │   └── finalizer.py              # FinalValues class
 │   │
-│   └── workflow_manager.py           # DataProcessingPipeline or WorkflowManager class
+│   └── pipeline.py           # DataProcessingPipeline or WorkflowManager class
 │
 ├── __init__.py                       # Make PipelineProject a Python package
 │
@@ -107,4 +107,26 @@ The deploy-mode specifies where the driver program runs.
 
 (--deploy-mode cluster): The driver runs on a node in the cluster. This is common in production, as it allows the driver to be managed by the cluster manager (like YARN or Mesos).
 
+## Explanation of the OOP structure
 
+### Review of SOLID principles
+
+#### 1. Single Responsibility Principle (SRP)
+
+Each class should have only one reason to change, meaning it should have only one job or responsibility.
+
+#### 2. Open/Closed Principle (OCP)
+
+Classes should be open for extension but closed for modification.
+
+#### 3. Liskov Substitution Principle (LSP)
+
+Objects of a superclass should be replaceable with objects of its subclasses without affecting the correctness of the program.
+
+#### 4. Interface Segregation Principle (ISP)
+
+Larger interfaces should be split into smaller ones. By doing so, a class will only have to know about the methods that are of interest to it.
+
+#### 5. Dependency Inversion Principle (DIP)
+
+High-level modules should not depend on low-level modules. Both should depend on abstractions.

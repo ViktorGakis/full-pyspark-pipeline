@@ -1,20 +1,16 @@
 import pymysql
 import pytest
 
-from Workflow.src.config import Config
-
-USER: str = Config.get_env("MYSQL_ROOT_USER")
-PASSWORD: str = Config.get_env("MYSQL_ROOT_PASSWORD")
-HOST: str = Config.get_env("HOST")
-PORT: str = int(Config.get_env("MYSQL_DOCKER_PORT"))
-DATABASE: str = Config.get_env("MYSQL_DATABASE")
-
 
 # Fixture to create a database connection
 @pytest.fixture(scope="module")
-def db_connection():
+def db_connection(config):
     con = pymysql.connect(
-        host=HOST, port=PORT, user=USER, password=PASSWORD, database=DATABASE
+        host=config.HOST,
+        port=int(config.MYSQL_DOCKER_PORT),
+        user=config.MYSQL_ROOT_USER,
+        password=config.MYSQL_ROOT_PASSWORD,
+        database=config.MYSQL_DATABASE,
     )
     yield con
     con.close()

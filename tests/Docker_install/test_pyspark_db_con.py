@@ -8,34 +8,6 @@ from pyspark.sql.types import (
     StructType,
 )
 
-from Workflow.src.config import Config
-
-USER: str = Config.get_env("MYSQL_ROOT_USER")
-PASSWORD: str = Config.get_env("MYSQL_ROOT_PASSWORD")
-HOST: str = Config.get_env("HOST")
-PORT: str = Config.get_env("MYSQL_DOCKER_PORT")
-DATABASE: str = Config.get_env("MYSQL_DATABASE")
-
-# MySQL connector configuration
-MYSQL_CONNECTOR_FILENAME: str = Config.get_env("MYSQL_CONNECTOR_FILENAME")
-MYSQL_CONNECTOR_PATH: str = Config.get_env("MYSQL_CONNECTOR_PATH")
-
-# Database configuration
-DB_CON_DICT = dict(
-    user=USER,
-    password=PASSWORD,
-    host=HOST,
-    port=PORT,
-    database=DATABASE,
-)
-
-MYSQL_PROPERTIES = {
-    "driver": "com.mysql.cj.jdbc.Driver",
-    "url": f"jdbc:mysql://{DB_CON_DICT['host']}:{DB_CON_DICT['port']}/{DB_CON_DICT['database']}",
-    "user": DB_CON_DICT["user"],
-    "password": DB_CON_DICT["password"],
-}
-
 # Table name
 TABLE_NAME = "test_table"
 
@@ -56,18 +28,18 @@ data = [
 
 
 @pytest.fixture(scope="module")
-def spark_session():
+def spark_session(config):
     # Initialize Spark
     import findspark
 
     findspark.init()
-    findspark.add_jars(MYSQL_CONNECTOR_PATH)
+    findspark.add_jars(config.MYSQL_CONNECTOR_PATH)
 
     spark = (
         SparkSession.builder.appName("DatabaseConnection")
-        .config("spark.jars", MYSQL_CONNECTOR_PATH)
-        .config("spark.driver.extraClassPath", MYSQL_CONNECTOR_PATH)
-        .config("spark.executor.extraClassPath", MYSQL_CONNECTOR_PATH)
+        .config("spark.jars", config.MYSQL_CONNECTOR_PATH)
+        .config("spark.driver.extraClassPath", config.MYSQL_CONNECTOR_PATH)
+        .config("spark.executor.extraClassPath", config.MYSQL_CONNECTOR_PATH)
         .getOrCreate()
     )
 
@@ -78,25 +50,25 @@ def spark_session():
     spark.stop()
 
 
-def test_database_operations(spark_session):
+def test_database_operations(spark_session, config):
     # Create DataFrame
     df = spark_session.createDataFrame(data, schema=SCHEMA_DB).orderBy("ID")
 
     # Write data to the database
     df.write.jdbc(
-        url=MYSQL_PROPERTIES["url"],
+        url=config.MYSQL_PROPERTIES["url"],
         table=TABLE_NAME,
         mode="overwrite",  # Use "append" if needed
-        properties=MYSQL_PROPERTIES,
+        properties=config.MYSQL_PROPERTIES,
     )
 
     # Read data from the database
     df_read = (
         spark_session.read.format("jdbc")
-        .option("url", MYSQL_PROPERTIES["url"])
+        .option("url", config.MYSQL_PROPERTIES["url"])
         .option("dbtable", TABLE_NAME)
-        .option("user", MYSQL_PROPERTIES["user"])
-        .option("password", MYSQL_PROPERTIES["password"])
+        .option("user", config.MYSQL_PROPERTIES["user"])
+        .option("password", config.MYSQL_PROPERTIES["password"])
         .load()
     )
 

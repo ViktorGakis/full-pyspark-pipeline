@@ -1,14 +1,10 @@
-from os import getenv
+from Workflow.src.config import Config
 
-from dotenv import load_dotenv
-
-load_dotenv()
-
-USER: str = getenv("MYSQL_ROOT_USER")
-PASSWORD: str = getenv("MYSQL_ROOT_PASSWORD")
-HOST: str = getenv("HOST")
-PORT: str = int(getenv("MYSQL_DOCKER_PORT"))
-DATABASE: str = getenv("MYSQL_DATABASE")
+USER: str = Config.get_env("MYSQL_ROOT_USER")
+PASSWORD: str = Config.get_env("MYSQL_ROOT_PASSWORD")
+HOST: str = Config.get_env("HOST")
+PORT: str = int(Config.get_env("MYSQL_DOCKER_PORT"))
+DATABASE: str = Config.get_env("MYSQL_DATABASE")
 
 
 def test_mysql_conx(

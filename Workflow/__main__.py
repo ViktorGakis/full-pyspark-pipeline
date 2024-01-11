@@ -1,18 +1,24 @@
-from src.config import Config
+# Workflow/src/pipeline.py
+from .src.config import Config
+from .src.database.manager import MysqlManager
+from .src.spark.session import Spark
 
-# from src.pipeline import Pipeline
-# from src.database.query_service import DatabaseQueryService
 
+def main() -> None:
+    # Create a Spark session
+    spark = Spark("WorkflowSession").create()
 
-def main():
-    config = Config()
-    # db_query_service = DatabaseQueryService()
+    
+    
+    
+    
+    # Initialize the database manager with the Spark session
+    db_manager = MysqlManager(spark)
 
-    # pipeline = Pipeline(config, db_query_service)
-    # pipeline.execute()
+    # Create the database
+    db_manager.create_db(Config.MYSQL_DATABASE)
 
-    # You can also handle outputs, logging, or any post-pipeline operations here
-    print(f'{config.get_env("MYSQL_ROOT_USER")}')
+    # Other pipeline operations...
 
 
 if __name__ == "__main__":

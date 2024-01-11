@@ -1,18 +1,13 @@
-from os import getenv
-
 import pymysql
 import pytest
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+from Workflow.src.config import Config
 
-# Database configuration
-USER = getenv("MYSQL_ROOT_USER")
-PASSWORD = getenv("MYSQL_ROOT_PASSWORD")
-HOST = getenv("HOST")
-PORT = int(getenv("MYSQL_DOCKER_PORT"))
-DATABASE = getenv("MYSQL_DATABASE")
+USER: str = Config.get_env("MYSQL_ROOT_USER")
+PASSWORD: str = Config.get_env("MYSQL_ROOT_PASSWORD")
+HOST: str = Config.get_env("HOST")
+PORT: str = int(Config.get_env("MYSQL_DOCKER_PORT"))
+DATABASE: str = Config.get_env("MYSQL_DATABASE")
 
 
 # Fixture to create a database connection

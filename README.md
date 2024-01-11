@@ -130,3 +130,26 @@ Larger interfaces should be split into smaller ones. By doing so, a class will o
 #### 5. Dependency Inversion Principle (DIP)
 
 High-level modules should not depend on low-level modules. Both should depend on abstractions.
+
+### Class explanations
+
+Our classes are built mostly with the SOLID principles in mind
+
+#### Config class
+
+```python
+# Workflow/src/config.py
+from os import getenv
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class Config:
+    @staticmethod
+    def get_config(key: str, default=None):
+        return os.getenv(key, default)
+```
+
+This class serves as a configuration holder. It follows the SRP as it's only responsible for holding configuration settings.
+
+It is also quite dynamic since it reads directly from the environment variables.

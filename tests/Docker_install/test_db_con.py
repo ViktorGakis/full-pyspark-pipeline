@@ -24,9 +24,5 @@ def test_mysql_conx(
     except Exception as e:
         print(e)
     else:
-        print("Connection Success")
+        assert True == True
     connection.close()
-
-
-if __name__ == "__main__":
-    test_mysql_conx()

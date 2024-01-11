@@ -154,6 +154,20 @@ This class serves as a configuration holder. It follows the SRP as it's only res
 
 It is also quite dynamic since it reads directly from the environment variables.
 
+#### Class Spark
+
+We use the Single Responsibility Principle (SRP) as this class should focus solely on Spark session management.
+
+```py
+# Workflow/src/spark/session.py
+class Spark:
+    def __init__(self, config: Config):
+
+    def create(self, *args, **kwargs):
+        # creates a spark session based on the config
+        pass
+```
+
 #### MYSQL classes
 
 We use the Dependency Inversion Principle (DIP) so that there is depence on abstractions not not conrections. i.e not directly implementing the actions.

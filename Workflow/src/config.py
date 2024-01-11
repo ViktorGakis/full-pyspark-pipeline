@@ -1,5 +1,5 @@
 from os import getenv
-from typing import Any
+from typing import Any, Optional
 
 from dotenv import load_dotenv
 
@@ -24,22 +24,27 @@ class Config:
     MYSQL_CONNECTOR_PATH: str | None = getenv("MYSQL_CONNECTOR_PATH")
     TABLE_NAME: str | None = getenv("TABLE_NAME")
     appName: str | None = getenv("appName")
-    # Database configuration
-    DB_CON_DICT = dict(
-        user=MYSQL_ROOT_USER,
-        password=MYSQL_ROOT_PASSWORD,
-        host=HOST,
-        port=MYSQL_DOCKER_PORT,
-        database=MYSQL_DATABASE,
-    )
 
-    MYSQL_PROPERTIES: dict[str, Any] = {
-        "driver": "com.mysql.cj.jdbc.Driver",
-        "url": f"jdbc:mysql://{DB_CON_DICT['host']}:{DB_CON_DICT['port']}/{DB_CON_DICT['database']}",
-        "user": DB_CON_DICT["user"],
-        "password": DB_CON_DICT["password"],
-    }
+    # Database configuration
+    @property
+    def DB_CON_DICT(self) -> dict[str, Any]:
+        return {
+            "user": self.MYSQL_ROOT_USER,
+            "password": self.MYSQL_ROOT_PASSWORD,
+            "host": self.HOST,
+            "port": self.MYSQL_DOCKER_PORT,
+            "database": self.MYSQL_DATABASE,
+        }
+
+    @property
+    def MYSQL_PROPERTIES(self) -> dict[str, Any]:
+        return {
+            "driver": "com.mysql.cj.jdbc.Driver",
+            "url": f"jdbc:mysql://{self.DB_CON_DICT['host']}:{self.DB_CON_DICT['port']}/{self.DB_CON_DICT['database']}",
+            "user": self.DB_CON_DICT["user"],
+            "password": self.DB_CON_DICT["password"],
+        }
 
     @staticmethod
-    def get_env(key: str, default=None):
+    def get_env(key: str, default=None) -> Optional[str]:
         return getenv(key, default)

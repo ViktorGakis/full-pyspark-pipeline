@@ -13,39 +13,44 @@ Note that we have created a quite involved docker image `Dockerfile.pythondev` t
 ## Application File Tree
 
 ```graphql
-Pipeline/
+Workflow/
 │
-├── src/                          # Source directory for all submodules
+├── src/
+│   ├── __init__.py                   # Make src a Python package
 │   │
-│   ├── config.py                 # Configuration settings
+│   ├── config.py                     # Configuration settings
 │   │
-│   ├── database/                 # Database management module
-│   │   ├── __init__.py
-│   │   └── manager.py            # DatabaseManager and MysqlManager classes
+│   ├── database/                     # Database management module
+│   │   ├── __init__.py               # Make database a Python package
+│   │   ├── manager.py                # DatabaseManager and MysqlManager classes
+│   │   └── query_service.py          # DatabaseQueryService class
 │   │
-│   ├── spark/                    # Spark session management module
-│   │   ├── __init__.py
-│   │   └── session.py            # Spark class
+│   ├── spark/                        # Spark session management module
+│   │   ├── __init__.py               # Make spark a Python package
+│   │   └── session.py                # Spark class
 │   │
-│   ├── data_loading/             # Data loading module
-│   │   ├── __init__.py
-│   │   └── loader.py             # LoadTxtData class
+│   ├── data_loading/                 # Data loading module
+│   │   ├── __init__.py               # Make data_loading a Python package
+│   │   └── loader.py                 # LoadTxtData class
 │   │
-│   ├── preprocessing/            # Data preprocessing module
-│   │   ├── __init__.py
-│   │   └── preprocessor.py       # PreprocessData class
+│   ├── preprocessing/                # Data preprocessing module
+│   │   ├── __init__.py               # Make preprocessing a Python package
+│   │   └── preprocessor.py           # PreprocessData class
 │   │
-│   ├── calculations/             # Calculations module
-│   │   ├── __init__.py
-│   │   └── calculators.py        # Calculation classes
+│   ├── calculations/                 # Calculations module
+│   │   ├── __init__.py               # Make calculations a Python package
+│   │   └── calculators.py            # CalculationEngine class
 │   │
-│   ├── final_values/             # Final value calculation module
-│   │   ├── __init__.py
-│   │   └── finalizer.py          # FinalValues class
+│   ├── final_values/                 # Final value calculation module
+│   │   ├── __init__.py               # Make final_values a Python package
+│   │   └── finalizer.py              # FinalValues class
 │   │
-│   └── pipeline.py               # Pipeline class
+│   └── workflow_manager.py           # DataProcessingPipeline or WorkflowManager class
 │
-└── __main__.py                   # Main application entry point as a package
+├── __init__.py                       # Make PipelineProject a Python package
+│
+└── __main__.py                       # Main application entry point as a package
+
 ```
 
 the pipeline package is supposed to be runnable directly with python but with spark job as a job

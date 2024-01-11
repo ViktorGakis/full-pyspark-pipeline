@@ -1,4 +1,5 @@
 from os import getenv
+from typing import Any
 
 from dotenv import load_dotenv
 
@@ -23,6 +24,21 @@ class Config:
     MYSQL_CONNECTOR_PATH: str | None = getenv("MYSQL_CONNECTOR_PATH")
     TABLE_NAME: str | None = getenv("TABLE_NAME")
     appName: str | None = getenv("appName")
+    # Database configuration
+    DB_CON_DICT = dict(
+        user=MYSQL_ROOT_USER,
+        password=MYSQL_ROOT_PASSWORD,
+        host=HOST,
+        port=MYSQL_DOCKER_PORT,
+        database=MYSQL_DATABASE,
+    )
+
+    MYSQL_PROPERTIES: dict[str, Any] = {
+        "driver": "com.mysql.cj.jdbc.Driver",
+        "url": f"jdbc:mysql://{DB_CON_DICT['host']}:{DB_CON_DICT['port']}/{DB_CON_DICT['database']}",
+        "user": DB_CON_DICT["user"],
+        "password": DB_CON_DICT["password"],
+    }
 
     @staticmethod
     def get_env(key: str, default=None):

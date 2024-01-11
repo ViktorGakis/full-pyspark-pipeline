@@ -7,5 +7,5 @@ load_dotenv()
 
 class Config:
     @staticmethod
-    def get_config(key: str, default=None):
+    def get_env(key: str, default=None):
         return getenv(key, default)

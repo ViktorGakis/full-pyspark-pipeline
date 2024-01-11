@@ -22,3 +22,4 @@ class Config:
     MYSQL_CONNECTOR_FILENAME: str | None = getenv("MYSQL_CONNECTOR_FILENAME")
     MYSQL_CONNECTOR_PATH: str | None = getenv("MYSQL_CONNECTOR_PATH")
     TABLE_NAME: str | None = getenv("TABLE_NAME")
+    appName: str | None = getenv("appName")

@@ -42,9 +42,9 @@ def test_pyspark_db_conx():
 
     spark = (
         SparkSession.builder.appName("DatabaseConnection")
-        # .config("spark.jars", MYSQL_CONNECTOR_PATH)
-        # .config("spark.driver.extraClassPath", MYSQL_CONNECTOR_PATH)
-        # .config("spark.executor.extraClassPath", MYSQL_CONNECTOR_PATH)
+        .config("spark.jars", MYSQL_CONNECTOR_PATH)
+        .config("spark.driver.extraClassPath", MYSQL_CONNECTOR_PATH)
+        .config("spark.executor.extraClassPath", MYSQL_CONNECTOR_PATH)
         .getOrCreate()
     )
     try:

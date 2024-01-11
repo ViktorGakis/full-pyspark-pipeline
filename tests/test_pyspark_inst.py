@@ -1,11 +1,10 @@
-import findspark
-
-findspark.init()
-
-from pyspark.sql import SparkSession
-
-
 def test_pyspark_con():
+    import findspark
+
+    findspark.init()
+
+    from pyspark.sql import SparkSession
+
     # Initialize SparkSession
     spark = SparkSession.builder.appName("PySparkExample").getOrCreate()
 

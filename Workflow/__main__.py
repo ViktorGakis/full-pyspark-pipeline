@@ -24,13 +24,14 @@ def main() -> None:
     DataSummary.display_summary(df_txt)
     print("\n")
     print("------------------------------")
-    print("DF_FILTERED")
+    print("DF_PREPROCESSED")
     print("------------------------------")
     df_processed: DataFrame = DataPreprocessor.run(df_txt, config)
     DataSummary.display_summary(df_processed)
+    print("\n")
     print("------------------------------")
-    print(" ")
     print("CalculationEngine")
+    print("------------------------------")
     CalculationEngine.run(df_processed)
 
 

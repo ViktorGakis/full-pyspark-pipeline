@@ -33,11 +33,11 @@ Workflow/
 │   │   ├── __init__.py               # Make data_loading a Python package
 │   │   └── loader.py                 # LoadTxtData class
 │   │
-│   ├── preprocessing/                # Data preprocessing module
+│   ├── data_preprocessing/           # Data preprocessing module
 │   │   ├── __init__.py               # Make preprocessing a Python package
 │   │   └── preprocessor.py           # PreprocessData class
 │   │
-│   ├── calculations/                 # Calculations module
+│   ├── calculation_engine/           # Calculations module
 │   │   ├── __init__.py               # Make calculations a Python package
 │   │   └── calculators.py            # CalculationEngine class
 │   │
@@ -45,7 +45,7 @@ Workflow/
 │   │   ├── __init__.py               # Make final_values a Python package
 │   │   └── finalizer.py              # FinalValues class
 │   │
-│   └── pipeline.py           # DataProcessingPipeline or WorkflowManager class
+│   └── pipeline.py                   # DataProcessingPipeline or WorkflowManager class
 │
 ├── __init__.py                       # Make PipelineProject a Python package
 │
@@ -289,7 +289,43 @@ class PreprocessData:
         pass
 ```
 
-#### CalculationEngine class
+```py
+from pyspark.sql import DataFrame, SparkSession
+from src import (
+    CalculationEngine,
+    Config,
+    DataPreprocessor,
+    DataSummary,
+    LoadTxtData,
+    Spark,
+    TxtSchemaProvider,
+)
+
+config = Config()
+
+
+def main() -> None:
+    config = Config()
+    spark: SparkSession = Spark(config).create()
+    print("------------------------------")
+    print("LOADING .TXT FILE")
+    print("------------------------------")
+    df_txt: DataFrame = LoadTxtData(
+        spark, TxtSchemaProvider.schema, config.TXT_FILE_REL_PATH_STR  # type: ignore
+    ).load_source_file()
+    DataSummary.display_summary(df_txt)
+    print("\n")
+    print("------------------------------")
+    print("DF_FILTERED")
+    print("------------------------------")
+    df_processed: DataFrame = DataPreprocessor.run(df_txt, config)
+    DataSummary.display_summary(df_processed)
+
+if __name__ == "__main__":
+    main()
+```
+
+### CalculationEngine class
 
 We follow the exact same structure as the data_preprocessing package.
 
@@ -321,4 +357,47 @@ class CalculationEngine:
         CalculationEngine.instr_2_mean_nov_2014(*args, **kwargs)
         CalculationEngine.instr_3_statistics(*args, **kwargs)
         CalculationEngine.sum_newest_10_elems(*args, **kwargs)
+```
+
+```py
+from pyspark.sql import DataFrame, SparkSession
+from src import (
+    CalculationEngine,
+    Config,
+    DataPreprocessor,
+    DataSummary,
+    LoadTxtData,
+    Spark,
+    TxtSchemaProvider,
+)
+
+config = Config()
+
+
+def main() -> None:
+    config = Config()
+    spark: SparkSession = Spark(config).create()
+    print("------------------------------")
+    print("LOADING .TXT FILE")
+    print("------------------------------")
+    df_txt: DataFrame = LoadTxtData(
+        spark, TxtSchemaProvider.schema, config.TXT_FILE_REL_PATH_STR  # type: ignore
+    ).load_source_file()
+    DataSummary.display_summary(df_txt)
+    print("\n")
+    print("------------------------------")
+    print("DF_FILTERED")
+    print("------------------------------")
+    df_processed: DataFrame = DataPreprocessor.run(df_txt, config)
+    DataSummary.display_summary(df_processed)
+    print("------------------------------")
+    print(" ")
+    print("------------------------------")
+    print("CalculationEngine")
+    print("------------------------------")    
+    CalculationEngine.run(df_processed)
+
+
+if __name__ == "__main__":
+    main()
 ```

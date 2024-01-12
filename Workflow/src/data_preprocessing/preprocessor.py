@@ -26,7 +26,7 @@ class DataPreprocessor:
     def cutoff_after_current_date(df: DataFrame, config) -> DataFrame:
         current_date = datetime.strptime(config.CURRENT_DATE, "%d-%m-%Y").date()
         cutoff_date = current_date
-        return df.filter(col("DATE") >= cutoff_date)
+        return df.filter(col("DATE") <= cutoff_date)
 
     @staticmethod
     def run(df: DataFrame, config) -> DataFrame:

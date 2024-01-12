@@ -6,16 +6,17 @@ class CalculationEngine:
 
     @staticmethod
     def instr_1_mean(df):
+        df_local = df
         """Calculate the mean for INSTRUMENT1."""
         print("mean for INSTRUMENT1.")
         (
-            df.groupBy("INSTRUMENT_NAME")
+            df_local.groupBy("INSTRUMENT_NAME")
             .agg(mean("VALUE").alias("MEAN"))
             .filter(col("INSTRUMENT_NAME") == "INSTRUMENT1")
         ).show()
 
     @staticmethod
-    def instr_2_mean_nov_2014(df, **kwargs):
+    def instr_2_mean_nov_2014(df) -> None:
         """Calculate the mean for INSTRUMENT2 for November 2014."""
 
 

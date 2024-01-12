@@ -2,8 +2,10 @@ from pyspark.sql import DataFrame, SparkSession
 from src import (
     CalculationEngine,
     Config,
+    DatabaseQueryService,
     DataPreprocessor,
     DataSummary,
+    DBSchemaProvider,
     LoadTxtData,
     MysqlManager,
     Spark,
@@ -15,7 +17,7 @@ config = Config()
 
 def main() -> None:
     config = Config()
-    # spark: SparkSession = Spark(config).create()
+    spark: SparkSession = Spark(config).create()
 
     # print("------------------------------")
     # print("LOADING .TXT FILE")
@@ -37,6 +39,14 @@ def main() -> None:
     # CalculationEngine.run(df_processed)
 
     MysqlManager(config).setup()
+
+    db_service: DatabaseQueryService = DatabaseQueryService(
+        spark_session=spark,
+        table_name=config.TABLE_NAME,
+        properties=config.MYSQL_PROPERTIES,
+        schema=DBSchemaProvider,
+        min_update_time=5,
+    )
 
 
 if __name__ == "__main__":

@@ -34,3 +34,9 @@ def test_create_database(mysql_manager):
     with patch.object(mysql_manager.connection, "cursor") as mock_cursor:
         mysql_manager.create_db()
         mock_cursor.assert_called()
+
+
+def test_create_table(mysql_manager):
+    with patch.object(mysql_manager.connection, "cursor") as mock_cursor:
+        mysql_manager.create_table()
+        mock_cursor.assert_called()

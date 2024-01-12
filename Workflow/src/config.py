@@ -26,8 +26,7 @@ class Config:
     MYSQL_CONNECTOR_PATH: str | None = getenv("MYSQL_CONNECTOR_PATH")
     TABLE_NAME: str | None = getenv("TABLE_NAME")
     appName: str | None = getenv("appName")
-    TXT_FILE_REL_PATH_STR: str | None = getenv("TXT_FILE_REL_PATH")
-    TXT_FILE_PATH: str = f"{CWD / Path(TXT_FILE_REL_PATH_STR)}"
+    TXT_FILE_REL_PATH_STR: str | None = getenv("TXT_FILE_REL_PATH_STR")
 
     # Database configuration
     @property

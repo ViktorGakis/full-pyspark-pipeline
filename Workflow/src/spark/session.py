@@ -1,12 +1,13 @@
-# Workflow/src/spark/session.py
-from ..config import Config
+from typing import Any
+
+from pyspark.sql import SparkSession
 
 
 class Spark:
-    def __init__(self, config: Config) -> None:
-        self.config: Config = config
+    def __init__(self, config: Any) -> None:
+        self.config = config
 
-    def create(self):
+    def create(self) -> SparkSession:
         import findspark
 
         findspark.init()

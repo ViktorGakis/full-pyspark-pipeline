@@ -145,6 +145,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
+    ...
     @staticmethod
     def get_config(key: str, default=None):
         return os.getenv(key, default)
@@ -154,7 +155,23 @@ This class serves as a configuration holder. It follows the SRP as it's only res
 
 It is also quite dynamic since it reads directly from the environment variables.
 
-#### Class Spark
+thus the main is modified as
+
+```py
+# Workflow/__main__.py
+from .src import Config
+
+config = Config()
+
+
+def main():
+    config = Config()
+
+if __name__ == "__main__":
+    main()
+```
+
+#### spark package
 
 We use the Single Responsibility Principle (SRP) as this class should focus solely on Spark session management.
 
@@ -168,9 +185,28 @@ class Spark:
         pass
 ```
 
-#### LoadTxtData Class
+thus the main is modified as
 
-We use the Single Responsibility Principle (SRP) as this class should responsible for loading the text data.
+```py
+# Workflow/__main__.py
+from pyspark.sql import DataFrame, SparkSession
+
+from .src import Config, Spark
+
+config = Config()
+
+
+def main() -> None:
+    config = Config()
+    spark: SparkSession = Spark(config).create()
+
+if __name__ == "__main__":
+    main()
+```
+
+#### data_loading package
+
+We use the Single Responsibility Principle (SRP) as these classes should responsible for loading the text data, creating the appropriate scheme and summarizing printing a summary and the head of the loaded df.
 
 ```py
 # Workflow/src/data_loading/loader.py
@@ -184,4 +220,42 @@ class LoadTxtData:
 
     def summary(self, *args, **kwargs):
         pass
+```
+
+```py
+# Workflow/src/data_loading/data_summary.py
+class DataSummary:
+    @staticmethod
+    def display_summary(*args, **kwargs) -> None:
+        pass
+```
+
+```py
+# Workflow/src/data_loading/schema_provider.py
+class TxtSchemaProvider:
+    schema = StructType(...)
+```
+
+thus the main is modified as
+
+```py
+# Workflow/__main__.py
+from pyspark.sql import DataFrame, SparkSession
+
+from .src import Config, DataSummary, LoadTxtData, Spark, TxtSchemaProvider
+
+config = Config()
+
+
+def main() -> None:
+    config = Config()
+    spark: SparkSession = Spark(config).create()
+    df_txt: DataFrame = LoadTxtData(
+        spark, TxtSchemaProvider.schema, config.TXT_FILE_REL_PATH_STR  # type: ignore
+    ).load_source_file()
+    DataSummary.display_summary(df_txt)
+
+
+if __name__ == "__main__":
+    main()
 ```

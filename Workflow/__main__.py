@@ -45,21 +45,17 @@ def main(verbose: bool = False) -> None:
 
     MysqlManager(config).setup()
 
-    db_service: DatabaseQueryService = DatabaseQueryService(
+    query_db = DatabaseQueryService(
         spark_session=spark,
         table_name=config.TABLE_NAME,
         properties=config.MYSQL_PROPERTIES,
-        schema=DBSchemaProvider,
-        min_update_time=5,
-    )
-
-    query_db = db_service.query_db_closure(True)
+    ).handle_query
 
     # Initialize FinalValues with rows and query_db function
-    final_values_calculator = FinalValues(df_processed.collect(), query_db)
 
-    # Calculate final values
-    final_values = final_values_calculator.final_values_cal()
+    final_values_calculator = FinalValues(query_db)
+    final_df = final_values_calculator.final_values_cal(spark)
+    final_df.show()
 
 
 if __name__ == "__main__":

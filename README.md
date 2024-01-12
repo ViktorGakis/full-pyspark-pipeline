@@ -431,36 +431,7 @@ class DatabaseQueryService:
     def handle_query(self, *args, **kwargs):
         """Function to query a specific instrument in the database."""
         pass
-
-    def query_db_closure(self, *args, **kwargs):
-        """Generates a closure function for querying the database."""
-        pass
 ```
-
-We also include one of the most important classes that handles the queries to the database adhering to the 5 second constraint for same instrument queries.
-
-The DatabaseQueryService class encapsulates the functionality related to querying a database. This encapsulation ensures that all database querying logic is contained within a single, cohesive unit.(Encapsulation)
-
-Since also the class has one reason to change – modifications to how the database is queried it also adheres to the SRP. In addition there is dependency injection since the methods need a spark_session.
-
-Finally, we use the notation of a closures so that the inner function query will "remember" the outer state of the function query_db_closure. This is way we can track the current and previous state of subsequent queries and set constraints.
-
-```py
-# Workflow/src/database/query_service.py
-class DatabaseQueryService:
-    def handle_query(self, spark_session, query):
-        """Function to query a specific instrument in the database."""
-        return spark_session.sql(query)
-
-    def query_db_closure(self, spark_session):
-        """Generates a closure function for querying the database."""
-
-        def query(query):
-            return self.handle_query(spark_session, query)
-
-        return query
-```
-
 
 #### FinalValues class
 

@@ -55,3 +55,5 @@ def test_final_value_calculation(spark):
     assert results == [("INSTRUMENT1", 150), ("INSTRUMENT2", 400), ("INSTRUMENT3", 300)]
 
 
+
+

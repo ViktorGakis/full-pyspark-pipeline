@@ -1,11 +1,21 @@
-from pyspark.sql.types import DoubleType, StringType, StructField, StructType
+from pyspark.sql.types import (
+    DoubleType,
+    IntegerType,
+    StringType,
+    StructField,
+    StructType,
+)
 
 
 class DBSchemaProvider:
     schema = StructType(
         [
-            StructField(name="INSTRUMENT_NAME", dataType=StringType(), nullable=True),
-            StructField(name="DATE", dataType=StringType(), nullable=True),
-            StructField(name="VALUE", dataType=DoubleType(), nullable=True),
+            StructField(
+                "ID", IntegerType(), False
+            ),  # False indicates that the field is not nullable
+            StructField(
+                "NAME", StringType(), True
+            ),  # True indicates that the field is nullable
+            StructField("MULTIPLIER", DoubleType(), True),
         ]
     )

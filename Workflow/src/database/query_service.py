@@ -4,13 +4,9 @@ class DatabaseService:
         self.config = config
 
     def get_multipliers_df(self):
-        multipliers_query = "SELECT NAME, MULTIPLIER FROM INSTRUMENT_PRICE_MODIFIER"
         return (
             self.spark_session.read.format("jdbc")
-            .options(
-                url=self.config.MYSQL_PROPERTIES["url"],
-                dbtable=f"({multipliers_query}) as multipliers",
-                properties=self.config.MYSQL_PROPERTIES,
-            )
+            .options(**self.config.MYSQL_PROPERTIES, dbtable=self.config.TABLE_NAME)
             .load()
+            .withColumnRenamed("NAME", "INSTRUMENT_NAME")
         )

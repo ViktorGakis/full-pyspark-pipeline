@@ -67,4 +67,4 @@ class Pipeline:
         final_df = self.calculate_final_values(df_processed, multipliers_df)
 
         self.log("Final DataFrame:")
-        final_df.show() if self.verbose else None
+        return final_df

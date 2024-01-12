@@ -1,3 +1,4 @@
+from pyspark.sql.functions import col
 from src import Config, Pipeline
 
 config = Config()
@@ -37,7 +38,7 @@ def main(verbose: bool = False):
         # Your data tuples
     ]
 
-    pipeline.run_pipeline(data)
+    pipeline.run_pipeline(data).filter(col("INSTRUMENT_NAME") == "INSTRUMENT2").show()
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 import pytest
-from pyspark.sql import DataFrame, Row
+from pyspark.sql import Row
 
-from Workflow.src import FinalValues
+from Workflow.src.final_values import FinalValues
 
 
 def mock_db_query_function(instrument_name, spark):

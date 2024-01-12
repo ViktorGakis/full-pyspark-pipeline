@@ -5,8 +5,22 @@ We have containerized our development environment along with an mysql database s
 In order to create this dev environment please run
 
 ```bash
+git clone https://github.com/ViktorGakis/wipro-python-app-prog-coding-challenge.git
+cd wipro-python-app-prog-coding-challenge
 docker-compose up -d
 ```
+
+then you can attach a shell to the w_pythondev container and run the tests to make sure that the dev environment is properly configured.
+
+```bash
+# make sure the container works properly
+pytest tests/Docker_install
+
+# make sure the Workflow works properly
+pytest tests/Workflow
+```
+
+All the tests should pass.
 
 Note that we have created a quite involved docker image `Dockerfile.pythondev` that includes all the needed groundwork for spark/pysparκ to be properly installed.
 
@@ -14,53 +28,47 @@ Note that we have created a quite involved docker image `Dockerfile.pythondev` t
 
 ```graphql
 Workflow/
-│
-├── src/
-│   ├── __init__.py                   # Make src a Python package
-│   │
-│   ├── config.py                     # Configuration settings
-│   │
-│   ├── database/                     # Database management module
-│   │   ├── __init__.py               # Make database a Python package
-│   │   ├── manager.py                # DatabaseManager and MysqlManager classes
-│   │   └── query_service.py          # DatabaseQueryService class
-│   │
-│   ├── spark/                        # Spark session management module
-│   │   ├── __init__.py               # Make spark a Python package
-│   │   └── session.py                # Spark class
-│   │
-│   ├── data_loading/                 # Data loading module
-│   │   ├── __init__.py               # Make data_loading a Python package
-│   │   └── loader.py                 # LoadTxtData class
-│   │
-│   ├── data_preprocessing/           # Data preprocessing module
-│   │   ├── __init__.py               # Make preprocessing a Python package
-│   │   └── preprocessor.py           # PreprocessData class
-│   │
-│   ├── calculation_engine/           # Calculations module
-│   │   ├── __init__.py               # Make calculations a Python package
-│   │   └── calculators.py            # CalculationEngine class
-│   │
-│   ├── final_values/                 # Final value calculation module
-│   │   ├── __init__.py               # Make final_values a Python package
-│   │   └── finalizer.py              # FinalValues class
-│   │
-│   └── pipeline.py                   # DataProcessingPipeline or WorkflowManager class
-│
-├── __init__.py                       # Make PipelineProject a Python package
-│
-└── __main__.py                       # Main application entry point as a package
+├── __init__.py                     # Makes Workflow a Python package
+├── __main__.py                     # Entry point of the application
+└── src                             # Source directory for the application modules
+    ├── __init__.py                 # Makes src a Python package
+    ├── calculation_engine          # Module for calculation logic
+    │   ├── __init__.py             
+    │   └── calculators.py          
+    ├── config.py                   # Configuration settings and parameters
+    ├── data_loading                # Module for loading and summarizing data
+    │   ├── __init__.py             
+    │   ├── data_summary.py         
+    │   ├── loader.py               
+    │   └── schema_provider.py      
+    ├── data_preprocessing          # Module for preprocessing the data
+    │   ├── __init__.py             
+    │   └── preprocessor.py         
+    ├── database                    # Module for database interactions
+    │   ├── __init__.py             
+    │   ├── database_injector.py    
+    │   ├── manager.py              
+    │   ├── mysql_manager.py        
+    │   ├── query_service.py        
+    │   └── schema_provider.py      
+    ├── final_values                # Module for final value calculations
+    │   ├── __init__.py             
+    │   └── finalizer.py            
+    ├── pipeline.py                 # Coordinates the overall data processing pipeline
+    └── spark                       # Module for Spark session management
+        ├── __init__.py             
+        └── session.py              
 
 ```
 
-the pipeline package is supposed to be runnable directly with python but with spark job as a job
+The Workflow package can be run as
 
 ```bash
 # run with python
-$ python -m Pipeline
+$ python Workflow/
 
 # run in a spark cluster locally
-$ spark-submit --master local[*] --deploy-mode client /app/pipeline/app.py
+$ spark-submit --master local[*] --deploy-mode client /app/Workflow/__main__.py
 ```
 
 the general command to run as a spark job is
@@ -155,22 +163,6 @@ This class serves as a configuration holder. It follows the SRP as it's only res
 
 It is also quite dynamic since it reads directly from the environment variables.
 
-thus the main is modified as
-
-```py
-# Workflow/__main__.py
-from .src import Config
-
-config = Config()
-
-
-def main():
-    config = Config()
-
-if __name__ == "__main__":
-    main()
-```
-
 #### spark package
 
 We use the Single Responsibility Principle (SRP) as this class should focus solely on Spark session management.
@@ -183,25 +175,6 @@ class Spark:
     def create(self, *args, **kwargs):
         # creates a spark session based on the config
         pass
-```
-
-thus the main is modified as
-
-```py
-# Workflow/__main__.py
-from pyspark.sql import DataFrame, SparkSession
-
-from .src import Config, Spark
-
-config = Config()
-
-
-def main() -> None:
-    config = Config()
-    spark: SparkSession = Spark(config).create()
-
-if __name__ == "__main__":
-    main()
 ```
 
 #### data_loading package
@@ -217,9 +190,6 @@ class LoadTxtData:
 
     def load_source_file(self, *args, **kwargs):
         pass
-
-    def summary(self, *args, **kwargs):
-        pass
 ```
 
 ```py
@@ -234,30 +204,6 @@ class DataSummary:
 # Workflow/src/data_loading/schema_provider.py
 class TxtSchemaProvider:
     schema = StructType(...)
-```
-
-thus the main is modified as
-
-```py
-# Workflow/__main__.py
-from pyspark.sql import DataFrame, SparkSession
-
-from .src import Config, DataSummary, LoadTxtData, Spark, TxtSchemaProvider
-
-config = Config()
-
-
-def main() -> None:
-    config = Config()
-    spark: SparkSession = Spark(config).create()
-    df_txt: DataFrame = LoadTxtData(
-        spark, TxtSchemaProvider.schema, config.TXT_FILE_REL_PATH_STR  # type: ignore
-    ).load_source_file()
-    DataSummary.display_summary(df_txt)
-
-
-if __name__ == "__main__":
-    main()
 ```
 
 ### data_preprocessing package
@@ -289,43 +235,7 @@ class PreprocessData:
         pass
 ```
 
-```py
-from pyspark.sql import DataFrame, SparkSession
-from src import (
-    CalculationEngine,
-    Config,
-    DataPreprocessor,
-    DataSummary,
-    LoadTxtData,
-    Spark,
-    TxtSchemaProvider,
-)
-
-config = Config()
-
-
-def main() -> None:
-    config = Config()
-    spark: SparkSession = Spark(config).create()
-    print("------------------------------")
-    print("LOADING .TXT FILE")
-    print("------------------------------")
-    df_txt: DataFrame = LoadTxtData(
-        spark, TxtSchemaProvider.schema, config.TXT_FILE_REL_PATH_STR  # type: ignore
-    ).load_source_file()
-    DataSummary.display_summary(df_txt)
-    print("\n")
-    print("------------------------------")
-    print("DF_FILTERED")
-    print("------------------------------")
-    df_processed: DataFrame = DataPreprocessor.run(df_txt, config)
-    DataSummary.display_summary(df_processed)
-
-if __name__ == "__main__":
-    main()
-```
-
-### CalculationEngine class
+### CalculationEngine package
 
 We follow the exact same structure as the data_preprocessing package.
 
@@ -359,49 +269,6 @@ class CalculationEngine:
         CalculationEngine.sum_newest_10_elems(*args, **kwargs)
 ```
 
-```py
-from pyspark.sql import DataFrame, SparkSession
-from src import (
-    CalculationEngine,
-    Config,
-    DataPreprocessor,
-    DataSummary,
-    LoadTxtData,
-    Spark,
-    TxtSchemaProvider,
-)
-
-config = Config()
-
-
-def main() -> None:
-    config = Config()
-    spark: SparkSession = Spark(config).create()
-    print("------------------------------")
-    print("LOADING .TXT FILE")
-    print("------------------------------")
-    df_txt: DataFrame = LoadTxtData(
-        spark, TxtSchemaProvider.schema, config.TXT_FILE_REL_PATH_STR  # type: ignore
-    ).load_source_file()
-    DataSummary.display_summary(df_txt)
-    print("\n")
-    print("------------------------------")
-    print("DF_FILTERED")
-    print("------------------------------")
-    df_processed: DataFrame = DataPreprocessor.run(df_txt, config)
-    DataSummary.display_summary(df_processed)
-    print("------------------------------")
-    print(" ")
-    print("------------------------------")
-    print("CalculationEngine")
-    print("------------------------------")    
-    CalculationEngine.run(df_processed)
-
-
-if __name__ == "__main__":
-    main()
-```
-
 ### database package
 
 We use the Dependency Inversion Principle (DIP) so that there is dependence on abstractions not conrections. i.e not directly implementing the actions.
@@ -427,10 +294,57 @@ We use the Single Responsibility Principle (SRP), as the DatabaseQueryService wi
 ```py
 # Workflow/src/database/query_service.py
 
-class DatabaseQueryService:
-    def handle_query(self, *args, **kwargs):
+class DatabaseService:
+    def get_multipliers_df(self, *args, **kwargs):
         """Function to query a specific instrument in the database."""
         pass
+```
+
+```py
+# Workflow/src/database/schema_provider.py
+
+class DBSchemaProvider:
+     schema = StructType(...)
+```
+
+```py
+# Workflow/src/database/mysql_manager.py
+
+class MysqlManager(DatabaseManager):
+    """A class that handles direct mysql connection and operations"""
+    def __init__(self, config) -> None:
+        super().__init__()
+        self.config = config
+        self.connection = None
+
+    def create_conx(self) -> None:
+        """Connection factory"""
+
+    def close_conx(self) -> None:
+        """Close connection"""
+
+    def create_db(self) -> None:
+        """Create a database if it does not exist."""
+
+    def create_table(self) -> None:
+        """Create a table if it does not exist."""
+
+    def setup(self) -> None:
+        """Set up the database and table."""
+```
+
+```py
+# Workflow/src/database/database_injector.py
+
+class DatabaseInjector:
+    """Injects data directly into the table INSTRUMENT_PRICE_MODIFIER"""
+    def __init__(self, spark: SparkSession, config):
+        self.spark: SparkSession = spark
+        self.config = config
+
+    def inject_data(self, data, schema, table_name):
+        # Create DataFrame from data
+        # Write DataFrame to the specified database table
 ```
 
 #### FinalValues class
@@ -451,3 +365,62 @@ class FinalValues:
     def final_values_cal(self, *args, **kwargs):
         pass
 ```
+
+### Pipeline
+
+The Pipeline class practically streamlines the whole process by providing encapsulation
+
+- This hides the internal state and functionality from outside interference and misuse.
+
+Single Responsibility Principle (SRP): Every method in the class has a single responsibility. For example, load_data is only responsible for loading data. This makes the class more robust, easier to maintain, and conducive to unit testing.
+
+Abstraction: The DataPipeline provides an abstract interface to a set of operations, hiding the complex underlying logic of data processing steps from the user of the pipeline.
+
+Modularity: The pipeline’s structure allows for easy modification and extension of individual parts without affecting the whole.
+
+- New steps can be added or existing ones modified with minimal impact on other parts of the pipeline.
+
+Reusability: The pipeline design facilitates the reuse of common processes or methods in different contexts within the application, thus promoting code reusability.
+
+```py
+# Workflow/src/pipeline.py
+class Pipeline:
+    def __init__(self, config, verbose=False):
+        self.config = config
+        self.verbose = verbose
+        self.spark = Spark(config).create()
+
+    def log(self, message):
+        """handles logging"""
+
+    def load_data(self):
+        """Handles loading data"""
+
+    def preprocess_data(self, df_txt):
+        """Handles preprocessing data"""
+
+    def run_calculations(self, df_processed):
+        """Handles running the calculations"""
+
+    def setup_database(self):
+        """Handles setting up the database"""
+
+    def inject_data(self, data, schema):
+        """Handles injecting data"""
+
+    def fetch_multipliers(self):
+        """Handles fetching the multipliers"""
+
+    def calculate_final_values(self, df_processed, multipliers_df):
+        """Handles calculating the final values"""
+
+    def run_pipeline(self, data=None):
+        """Handles runnung the whole pipeline"""
+```
+
+## Tests
+
+We have create two sets of tests in the tests folder.
+
+- Docker_install: Which determine if the container is running properly
+- Workflow: 

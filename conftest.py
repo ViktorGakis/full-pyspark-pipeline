@@ -7,18 +7,8 @@ from pytest import fixture
 sys.path.append(os.path.dirname(__file__))
 
 from Workflow.src.config import Config
-from Workflow.src.spark import Spark
 
 
 @fixture(scope="module")
 def config() -> Config:
     return Config()
-
-
-@fixture(scope="module")
-def spark_session(config):
-    spark = Spark(config).create()
-
-    yield spark
-
-    spark.stop()

@@ -1,4 +1,5 @@
 from os import getenv
+from pathlib import Path
 from typing import Any, Optional
 
 from dotenv import load_dotenv
@@ -7,6 +8,7 @@ load_dotenv()
 
 
 class Config:
+    CWD: Path = Path("/app/")
     MYSQL_ROOT_USER: str | None = getenv("MYSQL_ROOT_USER")
     MYSQL_ROOT_HOST: str | None = getenv("MYSQL_ROOT_HOST")
     MYSQL_ROOT_PASSWORD: str | None = getenv("MYSQL_ROOT_PASSWORD")
@@ -24,6 +26,8 @@ class Config:
     MYSQL_CONNECTOR_PATH: str | None = getenv("MYSQL_CONNECTOR_PATH")
     TABLE_NAME: str | None = getenv("TABLE_NAME")
     appName: str | None = getenv("appName")
+    TXT_FILE_REL_PATH_STR: str | None = getenv("TXT_FILE_REL_PATH")
+    TXT_FILE_PATH: str = f"{CWD / Path(TXT_FILE_REL_PATH_STR)}"
 
     # Database configuration
     @property

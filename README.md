@@ -272,18 +272,19 @@ We used static methods since these methods operate on the data passed to them an
 # Workflow/src/preprocessing/preprocessor.py
 
 class PreprocessData:
-    def __init__(self, data):
-        self.data = data
-
+    @staticmethod 
     def date_transform(self, *args, **kwargs):
         pass
 
+    @staticmethod 
     def date_sorting(self, *args, **kwargs):
         pass
 
+    @staticmethod 
     def business_date_validation(self, *args, **kwargs):
         pass
 
+    @staticmethod 
     def cutoff_after_current_date(self, *args, **kwargs):
         pass
 ```

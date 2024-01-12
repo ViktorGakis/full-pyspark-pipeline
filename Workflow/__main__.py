@@ -34,6 +34,7 @@ def main(verbose: bool = False) -> None:
         print("DF_PREPROCESSED")
         print("------------------------------")
     df_processed: DataFrame = DataPreprocessor.run(df_txt, config)
+    
     if verbose:
         DataSummary.display_summary(df_processed)
         print("\n")
@@ -54,7 +55,11 @@ def main(verbose: bool = False) -> None:
 
     query_db = db_service.query_db_closure(True)
 
+    # Initialize FinalValues with rows and query_db function
+    final_values_calculator = FinalValues(df_processed.collect(), query_db)
 
+    # Calculate final values
+    final_values = final_values_calculator.final_values_cal()
 
 
 if __name__ == "__main__":

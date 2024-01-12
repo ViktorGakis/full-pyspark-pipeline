@@ -54,3 +54,7 @@ class Config:
     @staticmethod
     def get_env(key: str, default=None) -> Optional[str]:
         return getenv(key, default)
+
+        # Sample data and schema
+
+

@@ -1,4 +1,5 @@
-from pyspark.sql.functions import col, day, mean, month, year
+from pyspark.sql.functions import col, day, mean, month, row_number, sum, year
+from pyspark.sql.window import Window, WindowSpec
 
 
 class CalculationEngine:
@@ -50,9 +51,29 @@ class CalculationEngine:
         instrument3_stats.select("summary", "VALUE").show()
 
     @staticmethod
-    def sum_newest_10_elems(df, **kwargs):
+    def sum_newest_10_elems(df, **kwargs) -> None:
         """Calculate the sum of the newest 10 elements in terms of the date."""
-        pass
+
+        # Define a window specification partitioned by 'INSTRUMENT_NAME' and ordered by date columns
+        # just like df_ordered_grouped
+        window_spec: WindowSpec = Window.partitionBy("INSTRUMENT_NAME").orderBy(
+            col("YEAR").desc(),
+            col("MONTH").desc(),
+            col("DAY").desc(),
+        )
+
+        # Add a row number column to the DataFrame based on the window specification
+        df_with_row_number = df.withColumn("row_num", row_number().over(window_spec))
+
+        df_last_10 = df_with_row_number.filter(col("row_num") <= 10)
+
+        # Group by 'INSTRUMENT_NAME' and calculate the sum of 'VALUE'
+        sum_values = df_last_10.groupBy("INSTRUMENT_NAME").agg(
+            sum("VALUE").alias("SUM_VALUE_LAST_10")
+        )
+
+        # Show the result
+        sum_values.show()
 
     @staticmethod
     def run(df) -> None:

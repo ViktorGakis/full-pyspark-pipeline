@@ -8,3 +8,4 @@ pyspark
 findspark
 mysql-connector-python
 pytest
+pytest-cov

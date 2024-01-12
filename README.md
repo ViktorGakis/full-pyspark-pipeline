@@ -10,19 +10,28 @@ cd wipro-python-app-prog-coding-challenge
 docker-compose up -d
 ```
 
-then you can attach a shell to the w_pythondev container and run the tests to make sure that the dev environment is properly configured.
+Note that we have created a quite involved docker image `Dockerfile.pythondev` that includes all the needed groundwork for spark/pysparκ to be properly installed.
+
+## Tests
+
+We have create two sets of tests in the tests folder.
+
+- Docker_install: Which determine if the container is running properly
+- Workflow: Which determine the overall "health" of the pipeline
+
+currently the test coverage is 66% which is good enough given that we have no actual big data. You can see a test coverage report by running
 
 ```bash
-# make sure the container works properly
-pytest tests/Docker_install
-
-# make sure the Workflow works properly
-pytest tests/Workflow
+pytest --cov=Workflow
 ```
 
-All the tests should pass.
+or just check which tests pass or fail using
 
-Note that we have created a quite involved docker image `Dockerfile.pythondev` that includes all the needed groundwork for spark/pysparκ to be properly installed.
+```bash
+pytest tests
+```
+
+When you run docker-compose all the tests should pass otherwise something is wrong with the building process.
 
 ## Application File Tree
 
@@ -417,10 +426,3 @@ class Pipeline:
     def run_pipeline(self, data=None):
         """Handles runnung the whole pipeline"""
 ```
-
-## Tests
-
-We have create two sets of tests in the tests folder.
-
-- Docker_install: Which determine if the container is running properly
-- Workflow: 

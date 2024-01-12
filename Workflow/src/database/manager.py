@@ -8,9 +8,6 @@ class DatabaseManager(ABC):
 
 
 class MysqlManager(DatabaseManager):
-    def __init__(self, spark_session):
-        self.spark_session = spark_session
-
-    def create_db(self, db_name) -> None:
+    def create_db(self, db_name, spark) -> None:
         # Use the provided Spark session to create the database
-        self.spark_session.sql(f"CREATE DATABASE IF NOT EXISTS {db_name}")
+        spark.sql(f"CREATE DATABASE IF NOT EXISTS {db_name}")

@@ -401,3 +401,38 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 ```
+
+### database package
+
+We use the Dependency Inversion Principle (DIP) so that there is dependence on abstractions not conrections. i.e not directly implementing the actions.
+
+```py
+# Workflow/src/database/manager.py
+
+from abc import ABC, abstractmethod
+
+class DatabaseManager(ABC):
+    @abstractmethod
+    def create_db(self, *args, **kwargs):
+        pass
+
+class MysqlManager(DatabaseManager):
+    def create_db(self, *args, **kwargs):
+        # Implementation for creating MySQL database
+        pass
+```
+
+We use the Single Responsibility Principle (SRP), as the DatabaseQueryService will act as a service. This service will encapsulate the logic for querying the database.
+
+```py
+# Workflow/src/database/query_service.py
+
+class DatabaseQueryService:
+    def handle_query(self, *args, **kwargs):
+        """Function to query a specific instrument in the database."""
+        pass
+
+    def query_db_closure(self, *args, **kwargs):
+        """Generates a closure function for querying the database."""
+        pass
+```

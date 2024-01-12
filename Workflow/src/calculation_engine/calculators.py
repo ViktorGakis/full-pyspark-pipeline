@@ -18,7 +18,23 @@ class CalculationEngine:
     @staticmethod
     def instr_2_mean_nov_2014(df) -> None:
         """Calculate the mean for INSTRUMENT2 for November 2014."""
+        print("Calculate the mean for INSTRUMENT2 for November 2014.")
+        df_grouped_year_month = df.groupBy(
+            "INSTRUMENT_NAME", year("DATE").alias("YEAR"), month("DATE").alias("MONTH")
+        ).agg({"VALUE": "mean"})
 
+        target_year = 2014
+        target_month = 11
+        target_instrument = "INSTRUMENT2"
+
+        # Filter the DataFrame
+        mean_value_INST2_2014_11 = df_grouped_year_month.filter(
+            (col("YEAR") == target_year)
+            & (col("MONTH") == target_month)
+            & (col("INSTRUMENT_NAME") == target_instrument)
+        )
+
+        mean_value_INST2_2014_11.show()
 
     @staticmethod
     def instr_3_statistics(df, **kwargs):

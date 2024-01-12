@@ -32,8 +32,8 @@ def test_database_operations(spark, config):
     # Write data to the database
     df.write.jdbc(
         url=config.MYSQL_PROPERTIES["url"],
-        table=config.TABLE_NAME,
-        mode="overwrite",  # Use "append" if needed
+        table=TABLE_NAME,
+        mode="overwrite",
         properties=config.MYSQL_PROPERTIES,
     )
 

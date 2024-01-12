@@ -26,7 +26,5 @@ def mysql_manager(config_mock):
         yield manager
 
 
-
-
-
-
+def test_create_connection_success(mysql_manager):
+    assert mysql_manager.connection is not None

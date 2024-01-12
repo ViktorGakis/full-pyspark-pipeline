@@ -1,6 +1,13 @@
 from pyspark.sql import DataFrame, SparkSession
-from src import Config, DataSummary, LoadTxtData, Spark, TxtSchemaProvider
-from src.data_preprocessing.preprocessor import DataPreprocessor
+from src import (
+    CalculationEngine,
+    Config,
+    DataPreprocessor,
+    DataSummary,
+    LoadTxtData,
+    Spark,
+    TxtSchemaProvider,
+)
 
 config = Config()
 
@@ -23,8 +30,9 @@ def main() -> None:
     DataSummary.display_summary(df_processed)
     print("------------------------------")
     print(" ")
-    print('CalculationEngine')
-    
+    print("CalculationEngine")
+    CalculationEngine.run(df_processed)
+
 
 if __name__ == "__main__":
     main()

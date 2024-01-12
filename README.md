@@ -260,7 +260,7 @@ if __name__ == "__main__":
     main()
 ```
 
-### preprocess package
+### data_preprocessing package
 
 We use the Single Responsibility Principle (SRP) as this class should responsible for preprocessing the loaded data.
 
@@ -291,27 +291,34 @@ class PreprocessData:
 
 #### CalculationEngine class
 
-We loosely use the Single Responsibility Principle (SRP) as this class should be responsible for performing very similar statistical calculations.
+We follow the exact same structure as the data_preprocessing package.
 
 ```py
-# Workflow/src/calculations/calculators.py
+# Workflow/src/calculation_engine/calculators.py
 
 class CalculationEngine:
     """Class for performing various calculations on financial instruments."""
 
-    def instr_1_mean(self, *args, **kwargs):
+    @staticmethod
+    def instr_1_mean(*args,**kwargs):
         """Calculate the mean for INSTRUMENT1."""
-        pass
 
-    def instr_2_mean_nov_2014(self, *args, **kwargs):
+    @staticmethod
+    def instr_2_mean_nov_2014(*args, **kwargs):
         """Calculate the mean for INSTRUMENT2 for November 2014."""
-        pass
 
-    def instr_3_statistics(self, *args, **kwargs):
+    @staticmethod
+    def instr_3_statistics(*args, **kwargs):
         """Perform statistical on-the-fly calculations for INSTRUMENT3."""
-        pass
 
-    def sum_newest_10_elems(self, *args, **kwargs):
+    @staticmethod
+    def sum_newest_10_elems(*args, **kwargs):
         """Calculate the sum of the newest 10 elements in terms of the date."""
-        pass
+
+    @staticmethod
+    def run(*args, **kwargs) -> None:
+        CalculationEngine.instr_1_mean(*args, **kwargs)
+        CalculationEngine.instr_2_mean_nov_2014(*args, **kwargs)
+        CalculationEngine.instr_3_statistics(*args, **kwargs)
+        CalculationEngine.sum_newest_10_elems(*args, **kwargs)
 ```

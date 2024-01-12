@@ -1,4 +1,4 @@
-## Containarization
+## Building
 
 We have containerized our development environment along with an mysql database server and phpadmin.
 
@@ -11,27 +11,6 @@ docker-compose up -d
 ```
 
 Note that we have created a quite involved docker image `Dockerfile.pythondev` that includes all the needed groundwork for spark/pysparκ to be properly installed.
-
-## Tests
-
-We have create two sets of tests in the tests folder.
-
-- Docker_install: Which determine if the container is running properly
-- Workflow: Which determine the overall "health" of the pipeline
-
-currently the test coverage is 66% which is good enough given that we have no actual big data. You can see a test coverage report by running
-
-```bash
-pytest --cov=Workflow
-```
-
-or just check which tests pass or fail using
-
-```bash
-pytest tests
-```
-
-When you run docker-compose all the tests should pass otherwise something is wrong with the building process.
 
 ## Application File Tree
 
@@ -85,6 +64,27 @@ the general command to run as a spark job is
 ```bash
 spark-submit --master [master-url] --deploy-mode [deploy-mode] path/to/your_project_name
 ```
+
+## Tests
+
+We have create two sets of tests in the tests folder.
+
+- Docker_install: Which determine if the container is running properly
+- Workflow: Which determine the overall "health" of the pipeline
+
+currently the test coverage is 66% which is good enough given that we have no actual big data. You can see a test coverage report by running
+
+```bash
+pytest --cov=Workflow
+```
+
+or just check which tests pass or fail using
+
+```bash
+pytest tests
+```
+
+When you run docker-compose all the tests should pass otherwise something is wrong with the building process.
 
 ### Master URL
 

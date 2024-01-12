@@ -37,9 +37,17 @@ class CalculationEngine:
         mean_value_INST2_2014_11.show()
 
     @staticmethod
-    def instr_3_statistics(df, **kwargs):
+    def instr_3_statistics(df) -> None:
         """Perform statistical on-the-fly calculations for INSTRUMENT3."""
-        pass
+
+        # Filter only the rows where 'INSTRUMENT_NAME' is 'INSTRUMENT3'
+        instrument3_df = df.filter(col("INSTRUMENT_NAME") == "INSTRUMENT3")
+
+        # Apply describe()
+        instrument3_stats = instrument3_df.describe()
+
+        # keep only meaningful columns
+        instrument3_stats.select("summary", "VALUE").show()
 
     @staticmethod
     def sum_newest_10_elems(df, **kwargs):

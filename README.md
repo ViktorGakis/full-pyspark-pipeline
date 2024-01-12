@@ -426,3 +426,13 @@ class Pipeline:
     def run_pipeline(self, data=None):
         """Handles runnung the whole pipeline"""
 ```
+
+## Notes
+
+- The notebooks task_part_1.ipynb and task_part_2.ipynb served as the foundation and mostly testing of the Workflow package. Since then a lot of changes have happened thus they are now only an approximation.
+
+- The .jar file was included for completeness.
+
+- The .env would normally not be included in production, but this is local development and quite convenient for reproducing the results.
+
+- We have also included the proper ports to access the Spark UI in <http://localhost:51000>

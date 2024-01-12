@@ -259,3 +259,31 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 ```
+
+### preprocess package
+
+We use the Single Responsibility Principle (SRP) as this class should responsible for preprocessing the loaded data.
+
+In fact the idea of the SRP propagates to the methods themselves since the perform a single action too.
+
+We used static methods since these methods operate on the data passed to them and do not need to maintain any internal state. They provide utility functions that transform a DataFrame and return a new DataFrame.
+
+```py
+# Workflow/src/preprocessing/preprocessor.py
+
+class PreprocessData:
+    def __init__(self, data):
+        self.data = data
+
+    def date_transform(self, *args, **kwargs):
+        pass
+
+    def date_sorting(self, *args, **kwargs):
+        pass
+
+    def business_date_validation(self, *args, **kwargs):
+        pass
+
+    def cutoff_after_current_date(self, *args, **kwargs):
+        pass
+```

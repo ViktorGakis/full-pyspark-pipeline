@@ -27,6 +27,7 @@ class Config:
     TABLE_NAME: str | None = getenv("TABLE_NAME")
     appName: str | None = getenv("appName")
     TXT_FILE_REL_PATH_STR: str | None = getenv("TXT_FILE_REL_PATH_STR")
+    CURRENT_DATE: str | None = getenv("CURRENT_DATE")
 
     # Database configuration
     @property

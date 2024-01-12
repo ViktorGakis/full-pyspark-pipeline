@@ -48,6 +48,9 @@ def main() -> None:
         min_update_time=5,
     )
 
+    query_db = db_service.query_db_closure(True)
+    
+    
 
 if __name__ == "__main__":
     main()

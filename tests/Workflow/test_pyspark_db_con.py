@@ -25,9 +25,9 @@ data = [
 ]
 
 
-def test_database_operations(spark_session, config):
+def test_database_operations(spark, config):
     # Create DataFrame
-    df = spark_session.createDataFrame(data, schema=SCHEMA_DB).orderBy("ID")
+    df = spark.createDataFrame(data, schema=SCHEMA_DB).orderBy("ID")
 
     # Write data to the database
     df.write.jdbc(
@@ -39,7 +39,7 @@ def test_database_operations(spark_session, config):
 
     # Read data from the database
     df_read = (
-        spark_session.read.format("jdbc")
+        spark.read.format("jdbc")
         .option("url", config.MYSQL_PROPERTIES["url"])
         .option("dbtable", TABLE_NAME)
         .option("user", config.MYSQL_PROPERTIES["user"])
@@ -55,4 +55,4 @@ def test_database_operations(spark_session, config):
     assert df_read.where("ID = 1").select("NAME").collect()[0][0] == "INSTRUMENT5"
 
     # Teardown: Drop the table and stop the Spark session
-    spark_session.sql(f"DROP TABLE IF EXISTS {TABLE_NAME}")
+    spark.sql(f"DROP TABLE IF EXISTS {TABLE_NAME}")

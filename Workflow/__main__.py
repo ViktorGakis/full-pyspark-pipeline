@@ -11,7 +11,7 @@ def main() -> None:
         spark, TxtSchemaProvider.schema, config.TXT_FILE_REL_PATH_STR  # type: ignore
     ).load_source_file()
     DataSummary.display_summary(df_txt)
-
+    
 
 if __name__ == "__main__":
     main()

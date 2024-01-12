@@ -1,4 +1,4 @@
-from datetime import _Date, datetime
+from datetime import datetime
 
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, dayofweek, to_date
@@ -24,7 +24,7 @@ class PreprocessData:
 
     @staticmethod
     def cutoff_after_current_date(df: DataFrame, config) -> DataFrame:
-        current_date: _Date = datetime.strptime(config.CURRENT_DATE, "%d-%m-%Y").date()
+        current_date = datetime.strptime(config.CURRENT_DATE, "%d-%m-%Y").date()
         cutoff_date = current_date
         return df.filter(col("DATE") <= cutoff_date)
 

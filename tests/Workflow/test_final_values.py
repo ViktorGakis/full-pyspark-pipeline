@@ -55,5 +55,30 @@ def test_final_value_calculation(spark):
     assert results == [("INSTRUMENT1", 150), ("INSTRUMENT2", 400), ("INSTRUMENT3", 300)]
 
 
+def test_with_large_sample_data(spark):
+    # Create a large DataFrame
+    large_rows = [
+        {"INSTRUMENT_NAME": f"INSTRUMENT{i % 3 + 1}", "VALUE": i * 100}
+        for i in range(1, 10000)
+    ]
+    df = spark.createDataFrame(large_rows)
 
+    # Create a Multipliers DataFrame
+    multipliers_data = [
+        ("INSTRUMENT1", 1.5),
+        ("INSTRUMENT2", 2.0),
+        ("INSTRUMENT3", None),
+    ]
+    multipliers_df = spark.createDataFrame(
+        multipliers_data, ["INSTRUMENT_NAME", "MULTIPLIER"]
+    )
+
+    # FinalValues instance with multipliers DataFrame
+    final_values_calculator = FinalValues(multipliers_df)
+
+    # Perform calculation
+    final_df = final_values_calculator.final_values_cal(df)
+
+    # Asserting the result is returned and has the expected number of rows
+    assert final_df.count() == len(large_rows)
 

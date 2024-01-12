@@ -1,37 +1,37 @@
-from random import randint
-from time import sleep
+from datetime import datetime, timedelta
+
+from pyspark.sql import SparkSession
 
 
 class FinalValues:
-    def __init__(self, rows, db_query_function):
-        """
-        rows: List of rows, each row is a dictionary representing data read from a .txt file.
-        db_query_function: Function obtained from the closure query_db_closure.
-        """
-        self.rows = rows
+    def __init__(self, db_query_function, cache_expiry=5):
         self.db_query_function = db_query_function
+        self.cache = {}  # Cache to store multipliers
+        self.cache_expiry = cache_expiry  # Cache expiry time in seconds
+
+    def get_multiplier(self, instrument):
+        current_time = datetime.now()
+        if (
+            instrument in self.cache
+            and (current_time - self.cache[instrument]["timestamp"]).seconds
+            < self.cache_expiry
+        ):
+            return self.cache[instrument]["multiplier"]
+
+        result_df = self.db_query_function(instrument)
+        multiplier = (
+            result_df.collect()[0]["MULTIPLIER"] if not result_df.isEmpty() else None
+        )
+        self.cache[instrument] = {"multiplier": multiplier, "timestamp": current_time}
+        return multiplier
 
     def final_value_calc_row(self, row):
-        """
-        Calculate the final value for a given row.
-        row: Dictionary representing a single row of data.
-        """
-        instrument = row["INSTRUMENT_NAME"]
-        result_df = self.db_query_function(instrument)
-        old_value = row["VALUE"]
+        multiplier = self.get_multiplier(row["INSTRUMENT_NAME"])
+        return row["VALUE"] * multiplier if multiplier is not None else row["VALUE"]
 
-        if result_df.isEmpty():
-            return old_value
-        return old_value * result_df.collect()[0]["MULTIPLIER"]
-
-    def final_values_cal(self, timelag: bool = True):
-        """
-        Calculate final values for all rows.
-        """
-        final_values = []
-        for row in self.rows:
-            final_value = self.final_value_calc_row(row)
-            final_values.append(final_value)
-            if timelag:
-                sleep(randint(1, 10))
-        return final_values
+    def final_values_cal(self, spark: SparkSession):
+        df = spark.createDataFrame(self.rows)
+        udf_calculate_final_value = udf(self.final_value_calc_row)
+        return df.withColumn(
+            "FINAL_VALUE", udf_calculate_final_value(df["INSTRUMENT_NAME"], df["VALUE"])
+        )

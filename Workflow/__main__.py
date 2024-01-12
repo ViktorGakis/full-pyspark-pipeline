@@ -34,7 +34,7 @@ def main(verbose: bool = False) -> None:
         print("DF_PREPROCESSED")
         print("------------------------------")
     df_processed: DataFrame = DataPreprocessor.run(df_txt, config)
-    
+
     if verbose:
         DataSummary.display_summary(df_processed)
         print("\n")

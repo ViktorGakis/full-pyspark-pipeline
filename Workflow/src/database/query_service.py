@@ -1,7 +1,3 @@
-# Workflow/src/database/query_service.py
-from datetime import datetime, timezone
-
-
 class DatabaseQueryService:
     def __init__(self, spark_session, table_name, properties):
         self.spark = spark_session

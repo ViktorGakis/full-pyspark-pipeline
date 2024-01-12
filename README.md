@@ -178,6 +178,7 @@ We use the Single Responsibility Principle (SRP) as this class should focus sole
 
 ```py
 # Workflow/src/spark/session.py
+
 class Spark:
     def __init__(self, config: Config):
 
@@ -203,6 +204,7 @@ class LoadTxtData:
 
 ```py
 # Workflow/src/data_loading/data_summary.py
+
 class DataSummary:
     @staticmethod
     def display_summary(*args, **kwargs) -> None:
@@ -211,6 +213,7 @@ class DataSummary:
 
 ```py
 # Workflow/src/data_loading/schema_provider.py
+
 class TxtSchemaProvider:
     schema = StructType(...)
 ```
@@ -393,6 +396,7 @@ Reusability: The pipeline design facilitates the reuse of common processes or me
 
 ```py
 # Workflow/src/pipeline.py
+
 class Pipeline:
     def __init__(self, config, verbose=False):
         self.config = config

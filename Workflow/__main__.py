@@ -1,6 +1,6 @@
 from pyspark.sql import DataFrame, SparkSession
 from src import Config, DataSummary, LoadTxtData, Spark, TxtSchemaProvider
-from src.preprocessing.preprocessor import PreprocessData
+from src.data_preprocessing.preprocessor import PreprocessData
 
 config = Config()
 

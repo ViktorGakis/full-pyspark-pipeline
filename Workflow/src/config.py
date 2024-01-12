@@ -28,6 +28,8 @@ class Config:
     appName: str | None = getenv("appName")
     TXT_FILE_REL_PATH_STR: str | None = getenv("TXT_FILE_REL_PATH_STR")
     CURRENT_DATE: str | None = getenv("CURRENT_DATE")
+    MAX_BUSINESS_WEEK_DAY: str | None = getenv("MAX_BUSINESS_WEEK_DAY")
+    MIN_BUSINESS_WEEK_DAY: str | None = getenv("MIN_BUSINESS_WEEK_DAY")
 
     # Database configuration
     @property

@@ -4,7 +4,7 @@ from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, dayofweek, to_date
 
 
-class PreprocessData:
+class DataPreprocessor:
     @staticmethod
     def date_transform(
         df: DataFrame, col_date_str="DATE", date_format_str="dd-MMM-yyyy"
@@ -18,10 +18,9 @@ class PreprocessData:
     @staticmethod
     def business_date_validation(df: DataFrame) -> DataFrame:
         df_with_dayofweek: DataFrame = df.withColumn("DAY_OF_WEEK", dayofweek("DATE"))
-        df_filtered = df_with_dayofweek.filter(
+        return df_with_dayofweek.filter(
             (col("DAY_OF_WEEK") >= 2) & (col("DAY_OF_WEEK") <= 6)
         )
-        return df_filtered.drop("DAY_OF_WEEK")
 
     @staticmethod
     def cutoff_after_current_date(df: DataFrame, config) -> DataFrame:
@@ -31,8 +30,9 @@ class PreprocessData:
 
     @staticmethod
     def run(df: DataFrame, config) -> DataFrame:
-        df = PreprocessData.date_transform(df)
-        df = PreprocessData.date_sorting(df)
-        df = PreprocessData.business_date_validation(df)
-        df = PreprocessData.cutoff_after_current_date(df, config)
+        df = DataPreprocessor.date_transform(df)
+        df = DataPreprocessor.date_sorting(df)
+        df = DataPreprocessor.business_date_validation(df)
+        df = df.drop("DAY_OF_WEEK")
+        df = DataPreprocessor.cutoff_after_current_date(df, config)
         return df

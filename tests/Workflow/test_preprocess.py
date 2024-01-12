@@ -28,3 +28,10 @@ def test_business_date_validation(df_txt, config) -> None:
         int(config.MAX_BUSINESS_WEEK_DAY),
     )
 
+def test_cutoff_after_current_date(df_txt, config):
+    df_txt_trans: DataFrame = DataPreprocessor.date_transform(df_txt)
+    df_txt_trans = DataPreprocessor.date_sorting(df_txt_trans)
+    # df_txt_trans = DataPreprocessor.cutoff_after_current_date(df_txt_trans, config)
+    max_value = df_txt_trans.agg(max(col("DATE")).alias("MAX")).collect()[0]["MAX"]
+    current_date = datetime.strptime(config.CURRENT_DATE, "%d-%m-%Y").date()
+    assert max_value == current_date

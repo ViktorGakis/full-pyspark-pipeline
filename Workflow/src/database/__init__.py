@@ -1,3 +1,3 @@
 from .mysql_manager import MysqlManager
-from .query_service import DatabaseQueryService
+from .query_service import DatabaseService
 from .schema_provider import DBSchemaProvider

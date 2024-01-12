@@ -2,10 +2,9 @@ from pyspark.sql import DataFrame, SparkSession
 from src import (
     CalculationEngine,
     Config,
-    DatabaseQueryService,
+    DatabaseService,
     DataPreprocessor,
     DataSummary,
-    DBSchemaProvider,
     FinalValues,
     LoadTxtData,
     MysqlManager,
@@ -45,17 +44,17 @@ def main(verbose: bool = False) -> None:
 
     MysqlManager(config).setup()
 
-    query_db = DatabaseQueryService(
-        spark_session=spark,
-        table_name=config.TABLE_NAME,
-        properties=config.MYSQL_PROPERTIES,
-    ).handle_query
+    db_service = DatabaseService(spark, config)
 
-    # Initialize FinalValues with rows and query_db function
+    multipliers_df = db_service.get_multipliers_df()
 
-    final_values_calculator = FinalValues(query_db)
-    final_df = final_values_calculator.final_values_cal(spark)
-    final_df.show()
+    final_values_calculator = FinalValues(multipliers_df)
+
+    final_df = final_values_calculator.final_values_cal(df_processed)
+
+    # Display final DataFrame
+    if verbose:
+        final_df.show()
 
 
 if __name__ == "__main__":

@@ -1,14 +1,16 @@
-class DatabaseQueryService:
-    def __init__(self, spark_session, table_name, properties):
-        self.spark = spark_session
-        self.table_name = table_name
-        self.properties = properties
+class DatabaseService:
+    def __init__(self, spark_session, config):
+        self.spark_session = spark_session
+        self.config = config
 
-    def handle_query(self, instrument_name):
-        """Function to query a specific instrument in the database."""
-        query: str = f"SELECT * FROM {self.table_name} WHERE NAME = '{instrument_name}'"
+    def get_multipliers_df(self):
+        multipliers_query = "SELECT NAME, MULTIPLIER FROM INSTRUMENT_PRICE_MODIFIER"
         return (
-            self.spark.read.format("jdbc")
-            .options(**self.properties, query=query)
+            self.spark_session.read.format("jdbc")
+            .options(
+                url=self.config.MYSQL_PROPERTIES["url"],
+                dbtable=f"({multipliers_query}) as multipliers",
+                properties=self.config.MYSQL_PROPERTIES,
+            )
             .load()
         )

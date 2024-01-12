@@ -462,3 +462,21 @@ class DatabaseQueryService:
 ```
 
 
+#### FinalValues class
+
+We use Dependency Inversion Principle (DIP), as the FinalValues class is directly handling database queries and is always better to depend on an abstraction rather than an actual implementation(i,e than the concrete details of database querying).
+
+```py
+# Workflow/src/final_values/finalizer.py
+
+class FinalValues:
+    def __init__(self, rows, db_query_function):
+        self.rows = rows
+        self.db_query_function = db_query_function
+
+    def final_value_calc_row(self, *args, **kwargs):
+        pass
+
+    def final_values_cal(self, *args, **kwargs):
+        pass
+```

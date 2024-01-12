@@ -440,3 +440,5 @@ class Pipeline:
 - The .env would normally not be included in production, but this is local development and quite convenient for reproducing the results.
 
 - We have also included the proper ports to access the Spark UI in <http://localhost:51000>
+
+- You can also access the phpadmin on [http://localhost:](http://localhost:9050/) with username:root and password: example

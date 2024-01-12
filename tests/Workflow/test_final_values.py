@@ -109,3 +109,31 @@ def test_distributed_processing_simulation(spark):
         (row["INSTRUMENT_NAME"], row["FINAL_VALUE"]) for row in final_df.collect()
     ]
     assert results == [("INSTRUMENT1", 150.0), ("INSTRUMENT2", 400.0)]
+
+
+def query_database_for_multipliers(spark, database_connection_details):
+    # This function should connect to the database and query for multipliers
+    # For demonstration, let's return a hard-coded list
+    multipliers_data = [("INSTRUMENT1", 1.5), ("INSTRUMENT2", 2.0)]
+    return spark.createDataFrame(multipliers_data, ["INSTRUMENT_NAME", "MULTIPLIER"])
+
+
+def test_integration_with_database(spark, config):
+    # Sample row data
+    rows = [{"INSTRUMENT_NAME": "INSTRUMENT1", "VALUE": 100}]
+    df = spark.createDataFrame(rows)
+
+    # Query the database for multipliers
+    multipliers_df = query_database_for_multipliers(spark, config.MYSQL_PROPERTIES)
+
+    # FinalValues instance with multipliers DataFrame
+    final_values_calculator = FinalValues(multipliers_df)
+
+    # Perform calculation
+    final_df = final_values_calculator.final_values_cal(df)
+
+    # Collect results and check
+    results = [
+        (row["INSTRUMENT_NAME"], row["FINAL_VALUE"]) for row in final_df.collect()
+    ]
+    assert results == [("INSTRUMENT1", 150.0)]

@@ -367,16 +367,40 @@ We use Dependency Inversion Principle (DIP), as the FinalValues class is directl
 # Workflow/src/final_values/finalizer.py
 
 class FinalValues:
-    def __init__(self, rows, db_query_function):
-        self.rows = rows
-        self.db_query_function = db_query_function
-
-    def final_value_calc_row(self, *args, **kwargs):
-        pass
+    def __init__(self, multipliers_df):
+        self.multipliers_df = multipliers_df
 
     def final_values_cal(self, *args, **kwargs):
         pass
 ```
+
+The explicit form of this class is
+
+```py
+class FinalValues:
+    def __init__(self, multipliers_df):
+        self.multipliers_df = multipliers_df
+
+    def final_values_cal(self, df):
+        # Join the input DataFrame with the multipliers DataFrame
+        df_with_multipliers = df.join(
+            self.multipliers_df, on="INSTRUMENT_NAME", how="left"
+        )
+
+        # Calculate the final value
+        return df_with_multipliers.withColumn(
+            "FINAL_VALUE", F.col("VALUE") * F.coalesce(F.col("MULTIPLIER"), F.lit(1))
+        )
+```
+
+The method final_values_cal performs:
+
+- First a left join on the INSTRUMENT_NAME with the multiplier_df.
+- Then the actual calculation of the final values takes place and the column is named FINAL_VALUE
+
+The left join ensures that all rows from the left DataFrame (df) are retained, and if there is no matching row in multipliers_df, the columns from multipliers_df will contain null values.
+
+Then we multiply the VALUE col with the MULTIPLIER col `F.col("VALUE") * F.coalesce(F.col("MULTIPLIER"), F.lit(1))`. To handle the MULTIPLIER column we use the coalesce function which replaces the null values with 1 (from F.lit(1)) and extracts the non-null values accordingly.
 
 ### Pipeline
 

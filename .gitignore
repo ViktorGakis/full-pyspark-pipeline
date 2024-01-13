@@ -4,7 +4,6 @@ test.ipynb
 void
 .pytest_cache
 spark-warehouse
-coding_challenge_files
-coding_challenge_files/
 .coverage
 .pylintrc
+task.txt

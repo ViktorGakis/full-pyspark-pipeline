@@ -1,3 +1,5 @@
+from pyspark.sql import DataFrame, SparkSession
+
 from .calculation_engine import CalculationEngine
 from .data_loading import DataSummary, LoadTxtData, TxtSchemaProvider
 from .data_preprocessing import DataPreprocessor
@@ -9,41 +11,41 @@ from .spark import Spark
 class Pipeline:
     def __init__(self, config, verbose=False):
         self.config = config
-        self.verbose = verbose
-        self.spark = Spark(config).create()
+        self.verbose: bool = verbose
+        self.spark: SparkSession = Spark(config).create()
 
-    def log(self, message):
+    def log(self, message) -> None:
         if self.verbose:
             print(message)
 
-    def load_data(self):
+    def load_data(self) -> DataFrame:
         self.log(
             "------------------------------\nLOADING .TXT FILE\n------------------------------"
         )
-        df_txt = LoadTxtData(
+        df_txt: DataFrame = LoadTxtData(
             self.spark, TxtSchemaProvider.schema, self.config.TXT_FILE_REL_PATH_STR
         ).load_source_file()
         DataSummary.display_summary(df_txt) if self.verbose else None
         return df_txt
 
-    def preprocess_data(self, df_txt):
+    def preprocess_data(self, df_txt) -> DataFrame:
         self.log(
             "\n------------------------------\nDF_PREPROCESSED\n------------------------------"
         )
-        df_processed = DataPreprocessor.run(df_txt, self.config)
+        df_processed: DataFrame = DataPreprocessor.run(df_txt, self.config)
         DataSummary.display_summary(df_processed) if self.verbose else None
         return df_processed
 
-    def run_calculations(self, df_processed):
+    def run_calculations(self, df_processed) -> None:
         self.log(
             "\n------------------------------\nCalculationEngine\n------------------------------"
         )
         CalculationEngine.run(df_processed)
 
-    def setup_database(self):
+    def setup_database(self) -> None:
         MysqlManager(self.config).setup()
 
-    def inject_data(self, data, schema):
+    def inject_data(self, data, schema) -> None:
         db_injector = DatabaseInjector(self.spark, self.config)
         db_injector.inject_data(data, schema, "INSTRUMENT_PRICE_MODIFIER")
 
@@ -56,8 +58,8 @@ class Pipeline:
         return final_values_calculator.final_values_cal(df_processed)
 
     def run_pipeline(self, data=None):
-        df_txt = self.load_data()
-        df_processed = self.preprocess_data(df_txt)
+        df_txt: DataFrame = self.load_data()
+        df_processed: DataFrame = self.preprocess_data(df_txt)
         self.run_calculations(df_processed)
 
         self.setup_database()

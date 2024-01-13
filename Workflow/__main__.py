@@ -1,45 +1,51 @@
+import ast
+from pathlib import Path
+
+from pyspark.sql import DataFrame
 from pyspark.sql.functions import col
 from src import Config, Pipeline
 
 config = Config()
 
-# Sample data With multipliers to be
-# injected into the database
-data: list[tuple[int, str, float]] = [
-    (1, "INSTRUMENT5", 5.19),
-    (2, "INSTRUMENT4", 5.05),
-    (3, "INSTRUMENT2", 4.4),
-    (4, "INSTRUMENT4", 2.25),
-    (5, "INSTRUMENT5", 1.75),
-    (6, "INSTRUMENT6", 9.91),
-    (7, "INSTRUMENT4", 4.5),
-    (8, "INSTRUMENT2", 9.24),
-    (9, "INSTRUMENT6", 5.83),
-    (10, "INSTRUMENT5", 1.34),
-    (11, "INSTRUMENT6", 8.89),
-    (12, "INSTRUMENT2", 2.59),
-    (13, "INSTRUMENT5", 4.04),
-    (14, "INSTRUMENT4", 8.58),
-    (15, "INSTRUMENT2", 8.64),
-    (16, "INSTRUMENT2", 3.99),
-    (17, "INSTRUMENT2", 6.82),
-    (18, "INSTRUMENT2", 7.7),
-    (19, "INSTRUMENT4", 4.44),
-    (20, "INSTRUMENT4", 8.01),
-]
 
-
-def main(verbose: bool = False):
+def main(verbose: bool = False, test_multiplier_data: bool = True) -> None:
     config = Config()
     pipeline = Pipeline(config, verbose)
 
-    # Define data to inject (if any)
-    data = [
-        # Your data tuples
-    ]
+    # Define data to inject (if any) in mysql table INSTRUMENT_PRICE_MODIFIER
+    # if no data is given, then whatever data exists in INSTRUMENT_PRICE_MODIFIER
+    # will be used
 
-    pipeline.run_pipeline(data).filter(col("INSTRUMENT_NAME") == "INSTRUMENT2").show()
+    if test_multiplier_data:
+        MULTIPLIER_TEST_DATA_PATH = Path(
+            config.get_env("MULTIPLIER_TEST_DATA_PATH_STR")
+        )
+        if MULTIPLIER_TEST_DATA_PATH.exists():
+            with MULTIPLIER_TEST_DATA_PATH.open("r") as f:
+                data = ast.literal_eval(f.read())
+                print(
+                    "\n\n--------- The test data is engineered to only contain INSTRUMENT2. ---------\n\n"
+                )
+        else:
+            print(f"The test data file {MULTIPLIER_TEST_DATA_PATH} was not found")
+
+    # test data is engineered to not have INSTRUMENT1 and INSTRUMENT3
+    df: DataFrame = pipeline.run_pipeline(data).drop(col("ID"))
+
+    # Filter and limit rows for each instrument
+    instrument1_df: DataFrame = df.filter(df["INSTRUMENT_NAME"] == "INSTRUMENT1").limit(
+        5
+    )
+    instrument2_df: DataFrame = df.filter(df["INSTRUMENT_NAME"] == "INSTRUMENT2").limit(
+        5
+    )
+    instrument3_df: DataFrame = df.filter(df["INSTRUMENT_NAME"] == "INSTRUMENT3").limit(
+        5
+    )
+
+    # Union the DataFrames
+    instrument1_df.union(instrument2_df).union(instrument3_df).show()
 
 
 if __name__ == "__main__":
-    main(True)
+    main(True, test_multiplier_data=True)

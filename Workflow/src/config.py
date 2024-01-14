@@ -31,6 +31,7 @@ class Config:
     MAX_BUSINESS_WEEK_DAY: str | None = getenv("MAX_BUSINESS_WEEK_DAY")
     MIN_BUSINESS_WEEK_DAY: str | None = getenv("MIN_BUSINESS_WEEK_DAY")
 
+
     # Database configuration
     @property
     def DB_CON_DICT(self) -> dict[str, Any]:

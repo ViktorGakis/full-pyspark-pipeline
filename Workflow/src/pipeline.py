@@ -27,7 +27,9 @@ class Pipeline:
     ) -> None:
         self.config: Config = config
         self.verbose: bool = verbose
-        self.spark: SparkSession = Spark(config).create() if spark is None else spark
+        self.spark: SparkSession = (
+            Spark(config=config).create() if spark is None else spark
+        )
 
     def log(self, message) -> None:
         if self.verbose:
@@ -38,7 +40,9 @@ class Pipeline:
             "------------------------------\nLOADING .TXT FILE\n------------------------------"
         )
         df_txt: DataFrame = LoadTxtData(
-            self.spark, TxtSchemaProvider.schema, self.config.TXT_FILE_REL_PATH_STR
+            spark=self.spark,
+            schema=TxtSchemaProvider.schema,
+            filepath_str=self.config.TXT_FILE_REL_PATH_STR,
         ).load_source_file()
         DataSummary.display_summary(df_txt) if self.verbose else None
         return df_txt
@@ -67,12 +71,12 @@ class Pipeline:
             table: str = self.config.TABLE_NAME
         if not schema:
             schema: StructType = DBSchemaProvider.schema
-        db_injector = DatabaseInjector(self.spark, self.config)
-        db_injector.inject_data(data, schema, table)
+        db_injector = DatabaseInjector(spark=self.spark, config=self.config)
+        db_injector.inject_data(data=data, schema=schema, table_name=table)
 
-    @cache_query(seconds=5)
+    @cache_query(seconds=5)  # 5 also by default
     def fetch_multipliers(self):
-        db_service = DatabaseService(self.spark, self.config)
+        db_service = DatabaseService(spark_session=self.spark, config=self.config)
         return db_service.get_multipliers_df()
 
     def calculate_final_values(self, df_processed, multipliers_df):
@@ -81,16 +85,18 @@ class Pipeline:
 
     def run_pipeline(self, data=None):
         df_txt: DataFrame = self.load_data()
-        df_processed: DataFrame = self.preprocess_data(df_txt)
-        self.run_calculations(df_processed)
+        df_processed: DataFrame = self.preprocess_data(df_txt=df_txt)
+        self.run_calculations(df_processed=df_processed)
 
         self.setup_database()
         self.inject_data(
-            data,
+            data=data,
         ) if data else None
 
         multipliers_df = self.fetch_multipliers()
-        final_df = self.calculate_final_values(df_processed, multipliers_df)
+        final_df = self.calculate_final_values(
+            df_processed=df_processed, multipliers_df=multipliers_df
+        )
 
         self.log("Final DataFrame:")
         return final_df

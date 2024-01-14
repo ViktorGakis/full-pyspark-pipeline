@@ -65,27 +65,6 @@ the general command to run as a spark job is
 spark-submit --master [master-url] --deploy-mode [deploy-mode] path/to/your_project_name
 ```
 
-## Tests
-
-We have create two sets of tests in the tests folder.
-
-- Docker_install: Which determine if the container is running properly
-- Workflow: Which determine the overall "health" of the pipeline
-
-currently the test coverage is 66% which is good enough given that we have no actual big data. You can see a test coverage report by running
-
-```bash
-pytest --cov=Workflow
-```
-
-or just check which tests pass or fail using
-
-```bash
-pytest tests
-```
-
-When you run docker-compose all the tests should pass otherwise something is wrong with the building process.
-
 ### Master URL
 
 The master-url specifies the master node of the Spark cluster. It tells Spark how to connect to a cluster manager which allocates resources for your application. Here are some common examples:
@@ -359,6 +338,51 @@ class DatabaseInjector:
         # Write DataFrame to the specified database table
 ```
 
+Finally, we added the cache mechanism that deals with the database frequency update. We decided to use a closure, in the form of a decorator, to be applied on our get_multipliers_df from DatabaseService.
+
+```py
+# Workflow/src/database/cache_mechanism.py
+
+from datetime import datetime, timezone
+from typing import Optional, Union
+
+from pyspark.sql import DataFrame
+
+
+def cache_query(seconds=5):  # -> Callable[..., Callable[..., DataFrame]]:
+    def decorator(fetch_function):  # -> Callable[..., DataFrame]:
+        cache: dict[str, Union[Optional[datetime], Optional[DataFrame]]] = {
+            "last_updated": None,
+            "data": None,
+        }
+
+        def wrapper(*args, **kwargs) -> DataFrame:
+            current_time: datetime = datetime.now(timezone.utc)
+            if (
+                cache["last_updated"] is None
+                or (current_time - cache["last_updated"]).total_seconds() > seconds  # type: ignore
+            ):
+                if cache["data"] is not None:
+                    # Clear previous cache
+                    cache["data"].unpersist()  # type: ignore 
+                cache["data"] = fetch_function(*args, **kwargs)
+                # Cache the new DataFrame
+                cache["data"].cache()  
+                cache["last_updated"] = current_time
+            return cache["data"]  # type: ignore
+
+        return wrapper
+
+    return decorator
+```
+
+The data is cached and uncached appropriately, as per Spark's best practices for memory management, especially in big data scenarios.
+
+- .cache() is used to cache the dataframe
+- .unpersist() is used to clean up the previous cache
+
+This decorator should effectively cache the results of the fetch_function and only refresh the cache if more than seconds (5 seconds in this case) have elapsed since the last update.
+
 #### FinalValues class
 
 We use Dependency Inversion Principle (DIP), as the FinalValues class is directly handling database queries and is always better to depend on an abstraction rather than an actual implementation(i,e than the concrete details of database querying).
@@ -445,6 +469,7 @@ class Pipeline:
     def inject_data(self, data, schema):
         """Handles injecting data"""
 
+    @cache_query(seconds=5) # cache every 5 seconds
     def fetch_multipliers(self):
         """Handles fetching the multipliers"""
 
@@ -454,6 +479,18 @@ class Pipeline:
     def run_pipeline(self, data=None):
         """Handles runnung the whole pipeline"""
 ```
+
+Notice the method cache_query is applied on fetch_multiplier
+
+```py
+    @cache_query(seconds=5) # cache every 5 seconds
+    def fetch_multipliers(self):
+        """Handles fetching the multipliers"""
+```
+
+
+
+When you run docker-compose all the tests should pass otherwise something is wrong with the building process.
 
 ## Notes
 

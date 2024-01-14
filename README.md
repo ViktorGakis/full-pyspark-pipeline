@@ -426,6 +426,8 @@ The left join ensures that all rows from the left DataFrame (df) are retained, a
 
 Then we multiply the VALUE col with the MULTIPLIER col `F.col("VALUE") * F.coalesce(F.col("MULTIPLIER"), F.lit(1))`. To handle the MULTIPLIER column we use the coalesce function which replaces the null values with 1 (from F.lit(1)) and extracts the non-null values accordingly.
 
+If the INSTRUMENT_PRICE_MODIFIER table has more than one multiplier for an instrument name, then the join will add sequentially all the multipliers on the current instances of the instrument in .TXT data and repeat until all instances have a multiplier.
+
 ### Pipeline
 
 The Pipeline class practically streamlines the whole process by providing encapsulation

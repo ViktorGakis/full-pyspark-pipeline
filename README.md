@@ -488,7 +488,44 @@ Notice the method cache_query is applied on fetch_multiplier
         """Handles fetching the multipliers"""
 ```
 
+## Tests
 
+We have create two sets of tests in the tests folder.
+
+```py
+tests
+├── Docker_install                  # ensures the docker containers have been properly run
+│   ├── test_db_con.py              # tests mysql database connection
+│   ├── test_prepare_table.py       # tests mysql database operations
+│   ├── test_pyspark_db_con.py      # tests the pyspark mysql database connection
+│   └── test_pyspark_inst.py        # tests the pyspark/spark installation
+│
+└── Workflow                        # ensures proper functionality of the tasks
+    ├── conftest.py                 # various test dependencies
+    ├── test_cached_multipliers.py  # test the query cache mechanism    
+    ├── test_config.py              # tests the config
+    ├── test_data_loading.py        # tests the loadinbg of data
+    ├── test_data_preprocess.py     # tests the preprocess of data
+    ├── test_final_values.py        # tests the calculation of the final values
+    ├── test_mysqlmanager.py        # tests the mysql database connection with pymysql
+    └── test_pyspark_db_con_work.py # tests the mysql database connection with spark
+```
+
+currently the test coverage is 96% which is good enough given that we have no actual big data.
+
+![Alt text](./tests/tests.png)
+
+You can see a test coverage report by running
+
+```bash
+pytest --cov=Workflow
+```
+
+or just check which tests pass or fail using
+
+```bash
+pytest tests
+```
 
 When you run docker-compose all the tests should pass otherwise something is wrong with the building process.
 

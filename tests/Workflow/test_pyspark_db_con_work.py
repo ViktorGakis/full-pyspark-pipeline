@@ -1,3 +1,4 @@
+from pyspark.sql import DataFrame
 from pyspark.sql.types import (
     DoubleType,
     IntegerType,
@@ -25,9 +26,9 @@ data = [
 ]
 
 
-def test_database_operations(spark, config):
+def test_database_operations(spark, config) -> None:
     # Create DataFrame
-    df = spark.createDataFrame(data, schema=SCHEMA_DB).orderBy("ID")
+    df: DataFrame = spark.createDataFrame(data, schema=SCHEMA_DB).orderBy("ID")
 
     # Write data to the database
     df.write.jdbc(
@@ -38,7 +39,7 @@ def test_database_operations(spark, config):
     )
 
     # Read data from the database
-    df_read = (
+    df_read: DataFrame = (
         spark.read.format("jdbc")
         .option("url", config.MYSQL_PROPERTIES["url"])
         .option("dbtable", TABLE_NAME)
@@ -54,5 +55,12 @@ def test_database_operations(spark, config):
     assert df_read.count() == len(data)
     assert df_read.where("ID = 1").select("NAME").collect()[0][0] == "INSTRUMENT5"
 
+
+def test_table_drop(mysqlmanager, config) -> None:
     # Teardown: Drop the table and stop the Spark session
-    spark.sql(f"DROP TABLE IF EXISTS {TABLE_NAME}")
+    mysqlmanager.drop_table(table=TABLE_NAME)
+    # Verification: Check if the table has been dropped
+    with mysqlmanager.connection.cursor() as cursor:
+        cursor.execute(f"SHOW TABLES LIKE '{TABLE_NAME}'")
+        result = cursor.fetchone()
+        assert result is None  # Table should not exist

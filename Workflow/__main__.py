@@ -10,7 +10,7 @@ config = Config()
 
 def main(verbose: bool = False, test_multiplier_data: bool = True) -> None:
     config = Config()
-    pipeline = Pipeline(config, verbose)
+    pipeline = Pipeline(None, config=config, verbose=verbose)
 
     # Define data to inject (if any) in mysql table INSTRUMENT_PRICE_MODIFIER
     # if no data is given, then whatever data exists in INSTRUMENT_PRICE_MODIFIER

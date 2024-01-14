@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pymysql
 
 from .manager import DatabaseManager
@@ -42,8 +44,14 @@ class MysqlManager(DatabaseManager):
             # Handle the database creation error, e.g., log or raise an exception
             raise RuntimeError(f"Failed to create the database: {e}")
 
-    def create_table(self) -> None:
+    def create_table(
+        self, table: Optional[str] = None, database: Optional[str] = None
+    ) -> None:
         """Create a table if it does not exist."""
+        if not table:
+            table: str = self.config.TABLE_NAME
+        if not database:
+            database: str = self.config.MYSQL_DATABASE
         try:
             # Use the database
             with self.connection.cursor() as cursor:
@@ -52,7 +60,7 @@ class MysqlManager(DatabaseManager):
                 # Create the table if it does not exist
                 cursor.execute(
                     f"""
-                    CREATE TABLE IF NOT EXISTS {self.config.TABLE_NAME} (
+                    CREATE TABLE IF NOT EXISTS {table} (
                         ID INT PRIMARY KEY,
                         NAME VARCHAR(255),
                         MULTIPLIER DOUBLE
@@ -62,6 +70,25 @@ class MysqlManager(DatabaseManager):
         except pymysql.Error as e:
             # Handle the table creation error, e.g., log or raise an exception
             raise RuntimeError(f"Failed to create the table: {e}")
+
+    def drop_table(
+        self, table: Optional[str] = None, database: Optional[str] = None
+    ) -> None:
+        """Drop a table if it exists."""
+        if not table:
+            table: str = self.config.TABLE_NAME
+        if not database:
+            database: str = self.config.MYSQL_DATABASE
+        try:
+            # Use the database
+            with self.connection.cursor() as cursor:
+                cursor.execute(f"USE {database}")
+
+                # Drop the table if it exists
+                cursor.execute(f"DROP TABLE IF EXISTS {table}")
+        except pymysql.Error as e:
+            # Handle the table dropping error, e.g., log or raise an exception
+            raise RuntimeError(f"Failed to drop the table: {e}")
 
     def setup(self) -> None:
         """Set up the database and table."""

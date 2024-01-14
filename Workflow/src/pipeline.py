@@ -1,18 +1,33 @@
+from typing import Optional
+
 from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql.types import StructType
 
 from .calculation_engine import CalculationEngine
+from .config import Config
 from .data_loading import DataSummary, LoadTxtData, TxtSchemaProvider
 from .data_preprocessing import DataPreprocessor
-from .database import DatabaseInjector, DatabaseService, DBSchemaProvider, MysqlManager
+from .database import (
+    DatabaseInjector,
+    DatabaseService,
+    DBSchemaProvider,
+    MysqlManager,
+    cache_query,
+)
 from .final_values import FinalValues
 from .spark import Spark
 
 
 class Pipeline:
-    def __init__(self, config, verbose=False):
-        self.config = config
+    def __init__(
+        self,
+        spark: SparkSession,
+        config: Config,
+        verbose: bool = False,
+    ) -> None:
+        self.config: Config = config
         self.verbose: bool = verbose
-        self.spark: SparkSession = Spark(config).create()
+        self.spark: SparkSession = Spark(config).create() if spark is None else spark
 
     def log(self, message) -> None:
         if self.verbose:
@@ -45,10 +60,17 @@ class Pipeline:
     def setup_database(self) -> None:
         MysqlManager(self.config).setup()
 
-    def inject_data(self, data, schema) -> None:
+    def inject_data(
+        self, data, table: Optional[str] = None, schema: Optional[StructType] = None  # type: ignore
+    ) -> None:
+        if not table:
+            table: str = self.config.TABLE_NAME
+        if not schema:
+            schema: StructType = DBSchemaProvider.schema
         db_injector = DatabaseInjector(self.spark, self.config)
-        db_injector.inject_data(data, schema, "INSTRUMENT_PRICE_MODIFIER")
+        db_injector.inject_data(data, schema, table)
 
+    @cache_query(seconds=5)
     def fetch_multipliers(self):
         db_service = DatabaseService(self.spark, self.config)
         return db_service.get_multipliers_df()
@@ -63,7 +85,9 @@ class Pipeline:
         self.run_calculations(df_processed)
 
         self.setup_database()
-        self.inject_data(data, DBSchemaProvider.schema) if data else None
+        self.inject_data(
+            data,
+        ) if data else None
 
         multipliers_df = self.fetch_multipliers()
         final_df = self.calculate_final_values(df_processed, multipliers_df)

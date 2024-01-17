@@ -56,14 +56,18 @@ def test_fetch_multipliers_caching(pipeline, mysqlmanager, config) -> None:
     inject_data(pipeline, config, DATA)
 
     # First call to populate cache
-    multipliers_df_1: DataFrame = pipeline.fetch_multipliers()
+    multipliers_df_1: DataFrame = pipeline.fetch_multipliers(
+        f"{config.TABLE_NAME}_TEST"
+    )
     assert multipliers_df_1 is not None
 
     # Short delay within caching window
     time.sleep(2)
 
     # Second call should fetch from cache
-    multipliers_df_2: DataFrame = pipeline.fetch_multipliers()
+    multipliers_df_2: DataFrame = pipeline.fetch_multipliers(
+        f"{config.TABLE_NAME}_TEST"
+    )
     assert multipliers_df_2 is not None
     # Checking if dataframes are the same
     assert multipliers_df_1._jdf.equals(multipliers_df_2._jdf)
@@ -72,7 +76,9 @@ def test_fetch_multipliers_caching(pipeline, mysqlmanager, config) -> None:
     time.sleep(6)
 
     # Third call should fetch new data
-    multipliers_df_3: DataFrame = pipeline.fetch_multipliers()
+    multipliers_df_3: DataFrame = pipeline.fetch_multipliers(
+        f"{config.TABLE_NAME}_TEST"
+    )
     assert multipliers_df_3 is not None
     # Dataframes should be different
     assert not multipliers_df_2._jdf.equals(multipliers_df_3._jdf)
